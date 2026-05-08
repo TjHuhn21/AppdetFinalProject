@@ -4,9 +4,11 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
@@ -23,6 +25,8 @@ public class SignUpActivity extends AppCompatActivity {
     Button btnRegister;
     AlertDialog.Builder builder;
 
+    Spinner spnrGender, spnrGoal;
+
     int userAge = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +38,15 @@ public class SignUpActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        spnrGender = findViewById(R.id.spGender);
+        String[] genders = {"Male", "Female"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, genders);
+        spnrGender.setAdapter(adapter);
+
+        spnrGoal = findViewById(R.id.spGoal);
+        String[] goals = {"Lose Weight", "Maintain", "Gain Muscle"};
+        ArrayAdapter<String> goalAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, goals);
+        spnrGoal.setAdapter(goalAdapter);
 
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
@@ -73,6 +86,7 @@ public class SignUpActivity extends AppCompatActivity {
                 displayMessage("Success", "Registration complete! Age: " + userAge);
 
                 Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
+                startActivity(intent);
 
 
             }
