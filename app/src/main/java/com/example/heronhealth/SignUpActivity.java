@@ -20,12 +20,14 @@ import androidx.core.view.WindowInsetsCompat;
 import java.util.Calendar;
 
 public class SignUpActivity extends AppCompatActivity {
-    EditText etUsername, etPassword, etEmail, etBirthday;
+    EditText etUsername, etPassword, etEmail, etBirthday ,etWeight, etHeight;
 
     Button btnRegister;
     AlertDialog.Builder builder;
 
     Spinner spnrGender, spnrGoal;
+
+    MyDatabaseHelper myDb;
 
     int userAge = 0;
     @Override
@@ -52,43 +54,83 @@ public class SignUpActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         etEmail = findViewById(R.id.etEmail);
         etBirthday = findViewById(R.id.etBirthday);
+        etWeight = findViewById(R.id.etWeight);
+        etHeight = findViewById(R.id.etHeight);
+        myDb = new MyDatabaseHelper(this);
 
         btnRegister= findViewById(R.id.btnRegister);
         builder = new AlertDialog.Builder(this);
         setEtBirthday();
         userRegister();
     }
-    public void userRegister(){
+    public void userRegister() {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 String username = etUsername.getText().toString().trim();
                 String password = etPassword.getText().toString().trim();
                 String email = etEmail.getText().toString().trim();
                 String birthday = etBirthday.getText().toString().trim();
 
-                if(username.isEmpty() || password.isEmpty() || email.isEmpty() || birthday.isEmpty()){
+
+                String gender = spnrGender.getSelectedItem().toString();
+                String goal = spnrGoal.getSelectedItem().toString();
+
+                if (username.isEmpty() || password.isEmpty() || email.isEmpty() ||
+                        birthday.isEmpty() || etWeight.getText().toString().isEmpty() ||
+                        etHeight.getText().toString().isEmpty()) {
                     displayMessage("Input Error!", "Please fill all fields");
+                    return;
+                }
+                String PASSWORD_PATTERN =
+                        "^(?=.*[0-9])" +         // at least one digit
+                                "(?=.*[a-z])" +         // at least one lowercase letter
+                                "(?=.*[A-Z])" +         // at least one uppercase letter
+                                "(?=.*[!@#$%^&*()-+=])" + // at least one special character
+                                "(?=\\S+$)" +           // no whitespace allowed
+                                ".{8,20}$";
+
+                if (!password.matches(PASSWORD_PATTERN)) {
+                    displayMessage("Weak Password",
+                            "Password must be at least 8 characters long, including " +
+                                    "uppercase, lowercase, a number, and a special character (@#$%^&+=!).");
                     return;
                 }
                 if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     displayMessage("Invalid Email", "Please enter a valid email address.");
                     return;
                 }
-                if (userAge < 0 || userAge > 120) {
-                    displayMessage("Invalid Age", "Please enter a realistic age (0-120).");
-                    return;
-                } else if (userAge < 14) {
-                    displayMessage("Age Restriction", "You must be at least 14 years old to use HeronHealth.");
+                if (password.length() < 6) {
+                    displayMessage("Weak Password", "Password must be at least 6 characters.");
                     return;
                 }
-                displayMessage("Success", "Registration complete! Age: " + userAge);
+                if (userAge < 14 || userAge > 120) {
+                    displayMessage("Age Restriction", "You must be at least 14 years old.");
+                    return;
+                }
 
-                Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-                startActivity(intent);
+                double weight = Double.parseDouble(etWeight.getText().toString());
+                double height = Double.parseDouble(etHeight.getText().toString());
 
+                if (weight < 20 || weight > 500) {
+                    displayMessage("Invalid Weight", "Please enter a realistic weight in kg.");
+                    return;
+                }
+                if (height < 50 || height > 250) {
+                    displayMessage("Invalid Height", "Please enter a realistic height in cm.");
+                    return;
+                }
 
+                boolean success = myDb.addUser(username, password, email,birthday, gender, weight, height, goal);
+
+                if (success) {
+                    displayMessage("Success", "Welcome to HeronHealth!");
+                    Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    displayMessage("Error", "Username or Email already exists.");
+                }
             }
         });
     }

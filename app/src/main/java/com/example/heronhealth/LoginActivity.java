@@ -60,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (!userMatch){
                     displayMessage("LogIn Error!", "Incorrect username or password");
                 }else {
-                    Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
                 }

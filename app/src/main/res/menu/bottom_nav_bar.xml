@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/dashboard"
+        android:icon="@drawable/dashboard"
+        android:title="Dashboard" />
+    <item
+        android:id="@+id/log"
+        android:icon="@drawable/clipboard"
+        android:title="Food Log" />
+    <!-- Empty item to create space for the Floating Action Button -->
+    <item
+        android:id="@+id/nav_more"
+        android:icon="@drawable/menu"
+        android:title="More" />
+</menu>

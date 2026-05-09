@@ -52,16 +52,24 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
 
     }
-    boolean addUser(String user, String pass, String email, int age) {
+    public boolean addUser(String user, String pass, String email,String birthday,
+                           String gender, double weight, double height, String goal) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
         cv.put(COLUMN_USERNAME, user);
         cv.put(COLUMN_PASSWORD, pass);
         cv.put(COLUMN_EMAIL, email);
-        cv.put(COLUMN_AGE, age);
+        cv.put(COLUMN_BIRTHDAY, birthday);
+        cv.put(COLUMN_GENDER, gender);
+        cv.put(COLUMN_WEIGHT, weight);
+        cv.put(COLUMN_HEIGHT, height);
+        cv.put(COLUMN_GOAL, goal);
 
         long result = db.insert(TABLE_NAME, null, cv);
+
+        db.close();
+
 
         return result != -1;
     }
