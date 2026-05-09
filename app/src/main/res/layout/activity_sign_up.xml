@@ -1,167 +1,287 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
-    tools:context=".LoginActivity">
+    android:background="@drawable/bg4"
+    android:fillViewport="true">
 
-    <TextView
-        android:id="@+id/tvSignUp"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="Sign Up"
-        android:textColor="@color/black"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:paddingBottom="30dp"
+        tools:context=".LoginActivity">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardRegister"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="30dp"
-        app:cardCornerRadius="15dp"
-        app:cardElevation="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvSignUp">
+        <!-- Logo -->
+        <ImageView
+            android:id="@+id/imgLogo"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="30dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="Heron Health Logo"
+            android:scaleType="centerCrop"
+            android:src="@drawable/logo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-        <LinearLayout
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tvSignUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Sign Up"
+            android:textColor="#1A365D"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imgLogo"
+            app:layout_constraintBottom_toTopOf="@id/tvSubtitle"/>
+
+        <!-- Subtitle -->
+        <TextView
+            android:id="@+id/tvSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            android:text="Built for a Healthier Tomorrow"
+            android:textColor="#2C3E50"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSignUp"
+            app:layout_constraintBottom_toTopOf="@id/cardRegister"
+            android:background="#9ed2e8"/>
 
-            <EditText
-                android:id="@+id/etUsername"
+        <!-- Main Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardRegister"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginEnd="24dp"
+            app:cardBackgroundColor="#beebfa"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSignUp">
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@android:color/transparent"
-                android:hint="Username"
-                android:inputType="text"
-                android:padding="10dp" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#DDDDDD" />
+                <!-- Username -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:boxBackgroundColor="#FFFFFF"
+                    app:boxCornerRadiusBottomEnd="14dp"
+                    app:boxCornerRadiusBottomStart="14dp"
+                    app:boxCornerRadiusTopEnd="14dp"
+                    app:boxCornerRadiusTopStart="14dp"
+                    app:boxStrokeColor="#2D9CDB"
+                    app:startIconDrawable="@drawable/ic_face"
+                    app:startIconTint="#1A365D">
 
-            <EditText
-                android:id="@+id/etPassword"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@android:color/transparent"
-                android:hint="Password"
-                android:inputType="textPassword"
-                android:padding="10dp" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etUsername"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Username"
+                        android:inputType="text"
+                        android:textColor="#2C3E50"
+                        android:paddingStart="40dp"
+                        android:background="#e8f6fc"/>
+                </com.google.android.material.textfield.TextInputLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#DDDDDD" />
+                <!-- Password -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:hint="Password"
+                    app:endIconMode="password_toggle"
+                    app:boxBackgroundColor="#FFFFFF"
+                    app:boxCornerRadiusBottomEnd="14dp"
+                    app:boxCornerRadiusBottomStart="14dp"
+                    app:boxCornerRadiusTopEnd="14dp"
+                    app:boxCornerRadiusTopStart="14dp"
+                    app:boxStrokeColor="#2D9CDB"
+                    app:startIconDrawable="@drawable/ic_lock"
+                    app:startIconTint="#1A365D">
 
-            <EditText
-                android:id="@+id/etEmail"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@android:color/transparent"
-                android:hint="Email"
-                android:inputType="textEmailAddress"
-                android:padding="10dp" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:textColor="#2C3E50"
+                        android:paddingStart="40dp"
+                        android:background="#e8f6fc"/>
+                </com.google.android.material.textfield.TextInputLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#DDDDDD" />
+                <!-- Email -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:hint="Email"
+                    app:boxBackgroundColor="#FFFFFF"
+                    app:boxCornerRadiusBottomEnd="14dp"
+                    app:boxCornerRadiusBottomStart="14dp"
+                    app:boxCornerRadiusTopEnd="14dp"
+                    app:boxCornerRadiusTopStart="14dp"
+                    app:boxStrokeColor="#2D9CDB"
+                    app:startIconDrawable="@drawable/ic_email"
+                    app:startIconTint="#1A365D">
 
-            <EditText
-                android:id="@+id/etBirthday"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@android:color/transparent"
-                android:hint="Birthday"
-                android:inputType="date"
-                android:clickable="true"
-                android:focusable="false"
-                android:padding="10dp" />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#DDDDDD" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress"
+                        android:textColor="#2C3E50"
+                        android:paddingStart="40dp"
+                        android:background="#e8f6fc"/>
+                </com.google.android.material.textfield.TextInputLayout>
 
-            <Spinner
-                android:id="@+id/spGender"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:padding="10dp" />
+                <!-- Birthday -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:hint="Birthday"
+                    app:boxBackgroundColor="#FFFFFF"
+                    app:boxCornerRadiusBottomEnd="14dp"
+                    app:boxCornerRadiusBottomStart="14dp"
+                    app:boxCornerRadiusTopEnd="14dp"
+                    app:boxCornerRadiusTopStart="14dp"
+                    app:boxStrokeColor="#2D9CDB"
+                    app:startIconDrawable="@drawable/ic_calendar"
+                    app:startIconTint="#1A365D">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#DDDDDD" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etBirthday"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="false"
+                        android:inputType="date"
+                        android:textColor="#2C3E50"
+                        android:paddingStart="40dp"
+                        android:background="#e8f6fc"/>
+                </com.google.android.material.textfield.TextInputLayout>
 
-            <EditText
-                android:id="@+id/etWeight"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@android:color/transparent"
-                android:hint="Weight (kg)"
-                android:inputType="numberDecimal"
-                android:padding="10dp" />
+                <!-- Gender Spinner -->
+                <Spinner
+                    android:id="@+id/spGender"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="14dp"
+                    android:background="#aee0e6"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#DDDDDD" />
+                <!-- Weight -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:hint="Weight (kg)"
+                    app:boxBackgroundColor="#FFFFFF"
+                    app:boxCornerRadiusBottomEnd="14dp"
+                    app:boxCornerRadiusBottomStart="14dp"
+                    app:boxCornerRadiusTopEnd="14dp"
+                    app:boxCornerRadiusTopStart="14dp"
+                    app:boxStrokeColor="#2D9CDB"
+                    app:startIconDrawable="@drawable/ic_weight"
+                    app:startIconTint="#1A365D">
 
-            <EditText
-                android:id="@+id/etHeight"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@android:color/transparent"
-                android:hint="Height (cm)"
-                android:inputType="numberDecimal"
-                android:padding="10dp" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etWeight"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal"
+                        android:textColor="#2C3E50"
+                        android:paddingStart="40dp"
+                        android:background="#e8f6fc"/>
+                </com.google.android.material.textfield.TextInputLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#DDDDDD" />
+                <!-- Height -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:hint="Height (cm)"
+                    app:boxBackgroundColor="#FFFFFF"
+                    app:boxCornerRadiusBottomEnd="14dp"
+                    app:boxCornerRadiusBottomStart="14dp"
+                    app:boxCornerRadiusTopEnd="14dp"
+                    app:boxCornerRadiusTopStart="14dp"
+                    app:boxStrokeColor="#2D9CDB"
+                    app:startIconDrawable="@drawable/ic_height"
+                    app:startIconTint="#1A365D">
 
-            <Spinner
-                android:id="@+id/spGoal"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:padding="10dp" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etHeight"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal"
+                        android:textColor="#2C3E50"
+                        android:paddingStart="40dp"
+                        android:background="#e8f6fc"/>
+                </com.google.android.material.textfield.TextInputLayout>
 
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+                <!-- Goal Spinner -->
+                <Spinner
+                    android:id="@+id/spGoal"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginTop="14dp"
+                    android:background="#aee0e6"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp" />
 
-    <Button
-        android:id="@+id/btnRegister"
-        android:layout_width="0dp"
-        android:layout_height="55dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="30dp"
-        android:backgroundTint="#1976D2"
-        android:text="Register"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        app:cornerRadius="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardRegister"/>
+            </LinearLayout>
 
+        </androidx.cardview.widget.CardView>
 
+        <!-- Register Button -->
+        <Button
+            android:id="@+id/btnRegister"
+            android:layout_width="0dp"
+            android:layout_height="58dp"
+            android:layout_marginStart="100dp"
+            android:layout_marginTop="26dp"
+            android:layout_marginEnd="100dp"
+            android:backgroundTint="#7dbed4"
+            android:elevation="4dp"
+            android:text="REGISTER"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            app:cornerRadius="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardRegister" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
