@@ -6,8 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".WaterAddActivity"
-    android:background="#12141D">
+    android:background="@drawable/bg4">
 
+    <!-- CLOSE BUTTON -->
     <ImageButton
         android:id="@+id/btnClose"
         android:layout_width="48dp"
@@ -18,35 +19,51 @@
         android:src="@android:drawable/ic_menu_close_clear_cancel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="#FFFFFF" />
+        app:tint="#1A365D" />
 
+    <!-- TITLE -->
     <TextView
         android:id="@+id/tvWaterTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hydration Status"
-        android:textColor="#FFFFFF"
+        android:textColor="#1A365D"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnClose" />
 
-    <!-- VOLUME MONITOR UI -->
+    <!-- WATER CARD -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardMonitor"
         android:layout_width="0dp"
         android:layout_height="180dp"
         android:layout_marginHorizontal="32dp"
         android:layout_marginTop="24dp"
-        app:cardBackgroundColor="#1A1E29"
         app:cardCornerRadius="16dp"
-        app:strokeColor="#4A90E2"
+        app:strokeColor="#2D9CDB"
         app:strokeWidth="2dp"
+        app:cardElevation="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvWaterTitle">
 
+        <!-- IMAGE BACKGROUND -->
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/water2"
+            android:scaleType="centerCrop"
+            android:alpha="0.85" />
+
+        <!-- DARK OVERLAY -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#2F000000"/>
+
+        <!-- CONTENT -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -57,8 +74,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Current Volume"
-                android:textColor="#8B95A5"
+                android:textColor="#FFFFFF"
                 android:textSize="14sp"
+                android:textStyle="bold"
                 android:textAllCaps="true"
                 android:letterSpacing="0.1"/>
 
@@ -68,32 +86,33 @@
                 android:layout_height="wrap_content"
                 android:text="0 ml"
                 android:textColor="#FFFFFF"
-                android:textSize="48sp"
-                android:textStyle="bold" />
+                android:textSize="52sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05"/>
 
             <ProgressBar
                 android:id="@+id/progressBarWater"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
-                android:layout_height="8dp"
+                android:layout_height="10dp"
                 android:layout_marginHorizontal="32dp"
                 android:layout_marginTop="16dp"
                 android:max="2500"
                 android:progress="0"
-                android:progressTint="#4A90E2"
-                android:backgroundTint="#2C3145"/>
+                android:progressTint="#2D9CDB"
+                android:backgroundTint="#e8f6fc"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Target: 2,500 ml"
-                android:textColor="#8B95A5"
-                android:textSize="14sp" />
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"/>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- QUICK ADD MODULES -->
+    <!-- QUICK ADD BUTTONS -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -103,52 +122,55 @@
         android:weightSum="4"
         app:layout_constraintTop_toBottomOf="@+id/cardMonitor">
 
-        <!-- 250ml Chip -->
         <Button
             android:id="@+id/btnAdd250"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:backgroundTint="#1E2230"
+            android:backgroundTint="#beebfa"
             android:text="+250\nml"
-            android:textColor="#4A90E2"
-            android:textSize="12sp" />
+            android:textColor="#2D9CDB"
+            android:elevation="0dp"
+            android:textSize="12sp"
+            app:cornerRadius="16dp"/>
 
-        <!-- 500ml Chip -->
         <Button
             android:id="@+id/btnAdd500"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:backgroundTint="#1E2230"
+            android:backgroundTint="#beebfa"
             android:text="+500\nml"
-            android:textColor="#4A90E2"
-            android:textSize="12sp" />
+            android:textColor="#2D9CDB"
+            android:elevation="0dp"
+            android:textSize="12sp"
+            app:cornerRadius="16dp"/>
 
-        <!-- 1000ml Chip -->
         <Button
             android:id="@+id/btnAdd1000"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:backgroundTint="#1E2230"
+            android:backgroundTint="#beebfa"
             android:text="+1000\nml"
-            android:textColor="#4A90E2"
-            android:textSize="12sp" />
+            android:textColor="#2D9CDB"
+            android:elevation="0dp"
+            android:textSize="12sp"
+            app:cornerRadius="16dp"/>
 
-        <!-- Custom Chip -->
         <Button
             android:id="@+id/btnCustom"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_weight="1"
-            android:backgroundTint="#4A90E2"
+            android:backgroundTint="#2D9CDB"
             android:text="Custom"
             android:textColor="#FFFFFF"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            app:cornerRadius="16dp"/>
     </LinearLayout>
 
     <!-- SAVE BUTTON -->
@@ -158,10 +180,11 @@
         android:layout_height="60dp"
         android:layout_marginHorizontal="24dp"
         android:layout_marginBottom="24dp"
-        android:backgroundTint="#33384D"
+        android:backgroundTint="#7dbed4"
         android:text="Save"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
+        app:cornerRadius="20dp"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

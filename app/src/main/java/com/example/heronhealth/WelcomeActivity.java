@@ -37,9 +37,9 @@ public class WelcomeActivity extends AppCompatActivity {
         btnLogIn = findViewById(R.id.btnLogin);
         ArrayList<SlideModel> slideModels = new ArrayList<>();
 
-        slideModels.add(new SlideModel(R.drawable.placeholderpic1, ScaleTypes.FIT));
-        slideModels.add(new SlideModel(R.drawable.placeholderpic2, ScaleTypes.FIT));
-        slideModels.add(new SlideModel(R.drawable.placeholderpic3, ScaleTypes.FIT));
+        slideModels.add(new SlideModel(R.drawable.heronwork, ScaleTypes.FIT));
+        slideModels.add(new SlideModel(R.drawable.heroneat, ScaleTypes.FIT));
+        slideModels.add(new SlideModel(R.drawable.heronrest, ScaleTypes.FIT));
 
         imageSlider.setImageList(slideModels, ScaleTypes.FIT);
 

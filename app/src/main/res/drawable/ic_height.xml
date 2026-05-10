@@ -4,7 +4,18 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
 
+    <!-- vertical line -->
     <path
         android:fillColor="#1A365D"
-        android:pathData="M10,4H14V6H10V4M10,18H14V20H10V18M7,6H17A2,2 0,0 1,19 8V16A2,2 0,0 1,17 18H7A2,2 0,0 1,5 16V8A2,2 0,0 1,7 6M11,10V14H13V10H11Z"/>
+        android:pathData="M11,3H13V21H11V3Z"/>
+
+    <!-- top arrow -->
+    <path
+        android:fillColor="#1A365D"
+        android:pathData="M12,2L9,5H11V7H13V5H15L12,2Z"/>
+
+    <!-- bottom arrow -->
+    <path
+        android:fillColor="#1A365D"
+        android:pathData="M12,22L15,19H13V17H11V19H9L12,22Z"/>
 </vector>

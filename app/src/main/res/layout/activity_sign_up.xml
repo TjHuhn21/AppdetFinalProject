@@ -18,30 +18,41 @@
         <!-- Logo -->
         <ImageView
             android:id="@+id/imgLogo"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_marginTop="30dp"
-            android:adjustViewBounds="true"
+            android:layout_width="100dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="10dp"
             android:contentDescription="Heron Health Logo"
             android:scaleType="centerCrop"
             android:src="@drawable/logo"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
+
+        <ImageView
+            android:id="@+id/imgAccount"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="10dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/account"
+            app:layout_constraintTop_toBottomOf="@id/imgLogo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/tvSubtitle"/>
 
         <!-- Title -->
         <TextView
             android:id="@+id/tvSignUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:text="Sign Up"
             android:textColor="#1A365D"
             android:textSize="30sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/imgLogo"
+            app:layout_constraintTop_toBottomOf="@id/imgAccount"
             app:layout_constraintBottom_toTopOf="@id/tvSubtitle"/>
 
         <!-- Subtitle -->

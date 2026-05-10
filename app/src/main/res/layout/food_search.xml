@@ -7,27 +7,28 @@
     android:layout_marginHorizontal="16dp"
     android:layout_marginTop="8dp"
     android:layout_marginBottom="4dp"
-    app:cardBackgroundColor="#1E2230"
-    app:cardCornerRadius="8dp"
-    app:strokeColor="#2C3145"
-    app:strokeWidth="1dp">
+    app:cardBackgroundColor="#beebfa"
+    app:cardCornerRadius="14dp"
+    app:strokeColor="#2D9CDB"
+    app:strokeWidth="1dp"
+    app:cardElevation="6dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Status Indicator (System Accent) -->
+        <!-- STATUS INDICATOR -->
         <View
             android:id="@+id/statusIndicator"
             android:layout_width="4dp"
             android:layout_height="0dp"
-            android:background="#00C853"
+            android:background="#2D9CDB"
             app:layout_constraintBottom_toBottomOf="@id/tvDetails"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/tvFoodName" />
 
-        <!-- Food Name -->
+        <!-- FOOD NAME -->
         <TextView
             android:id="@+id/tvFoodName"
             android:layout_width="0dp"
@@ -37,27 +38,27 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:text="Food Name"
-            android:textColor="#FFFFFF"
+            android:textColor="#1A365D"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/btnAddFood"
             app:layout_constraintStart_toEndOf="@id/statusIndicator"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Calories and Servings -->
+        <!-- DETAILS -->
         <TextView
             android:id="@+id/tvDetails"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="000 cal | Serving Details"
-            android:textColor="#8B95A5"
+            android:textColor="#2C3E50"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="@id/tvFoodName"
             app:layout_constraintStart_toStartOf="@id/tvFoodName"
             app:layout_constraintTop_toBottomOf="@id/tvFoodName" />
 
-        <!-- Add Button (Action Module) -->
+        <!-- ADD BUTTON -->
         <ImageButton
             android:id="@+id/btnAddFood"
             android:layout_width="40dp"
@@ -66,10 +67,10 @@
             android:contentDescription="Add to log"
             android:scaleType="centerInside"
             android:src="@android:drawable/ic_input_add"
+            app:tint="#2D9CDB"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="#4A90E2" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

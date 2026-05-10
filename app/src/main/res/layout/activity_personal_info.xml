@@ -1,123 +1,215 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1B1E2B"
+    android:background="@drawable/bg4"
     android:padding="16dp"
     tools:context=".PersonalInfoActivity">
 
-    <!-- BACK BUTTON & HEADER -->
-    <ImageButton
-        android:id="@+id/btnBack"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@android:drawable/ic_menu_revert"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/backContainer"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        app:cardCornerRadius="22dp"
+        app:cardBackgroundColor="#beebfa"
+        app:cardElevation="6dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="#FFFFFF" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:src="@android:drawable/ic_menu_revert"
+            android:contentDescription="Back"/>
+    </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/imgProfile"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_marginTop="16dp"
+        android:src=""
+        android:background="@drawable/circle_bg"
+        android:padding="10dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintTop_toBottomOf="@id/backContainer"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <TextView
         android:id="@+id/tvHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:text="Edit Profile"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
+        android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/btnBack"
-        app:layout_constraintStart_toEndOf="@+id/btnBack"
-        app:layout_constraintTop_toTopOf="@+id/btnBack" />
+        android:textColor="#1A365D"
+        app:layout_constraintTop_toTopOf="@id/backContainer"
+        app:layout_constraintBottom_toBottomOf="@id/backContainer"
+        app:layout_constraintStart_toEndOf="@id/backContainer"
+        android:layout_marginStart="12dp"/>
 
-    <!-- USERNAME ROW -->
     <TextView
-        android:id="@+id/lblUsername"
+        android:id="@+id/tvSubtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="User Name"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
+        android:text="Manage your personal information"
+        android:textSize="14sp"
+        android:textColor="#2C3E50"
+        android:textStyle="bold"
+        android:layout_marginTop="50dp"
+        android:layout_marginStart="50dp"
+        app:layout_constraintTop_toBottomOf="@id/backContainer"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnBack" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <TextView
-        android:id="@+id/tvUsernameValue"
-        android:layout_width="wrap_content"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardInfo"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Tj Huhn Atayde"
-        android:textColor="#4A90E2"
-        app:layout_constraintBottom_toBottomOf="@id/lblUsername"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/lblUsername" />
-
-    <!-- HEIGHT ROW -->
-    <TextView
-        android:id="@+id/lblHeight"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="Height"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="10dp"
+        app:cardBackgroundColor="#beebfa"
+        app:layout_constraintTop_toBottomOf="@id/imgProfile"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lblUsername" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <TextView
-        android:id="@+id/tvHeightValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="5 ft 4 in"
-        android:textColor="#4A90E2"
-        app:layout_constraintBottom_toBottomOf="@id/lblHeight"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/lblHeight" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
 
-    <!-- BIRTHDAY ROW -->
-    <TextView
-        android:id="@+id/lblDOB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="Date of Birth"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="User Name"
+                    android:textColor="#1A365D"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tvUsernameValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tj Huhn Atayde"
+                    android:textColor="#2D9CDB"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Height"
+                    android:textColor="#1A365D"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tvHeightValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="5 ft 4 in"
+                    android:textColor="#2D9CDB"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Date of Birth"
+                    android:textColor="#1A365D"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tvDOBValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="May 5, 2007"
+                    android:textColor="#2D9CDB"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Email"
+                    android:textColor="#1A365D"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tvEmailValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="tjatayde@gmail.com"
+                    android:textColor="#2D9CDB"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/btnEdit"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:text="EDIT PROFILE"
         android:textColor="#FFFFFF"
-        android:textSize="16sp"
+        android:textStyle="bold"
+        android:backgroundTint="#7dbed4"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginEnd="60dp"
+        app:cornerRadius="20dp"
+        app:layout_constraintTop_toBottomOf="@id/cardInfo"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lblHeight" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <TextView
-        android:id="@+id/tvDOBValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="May 5, 2007"
-        android:textColor="#4A90E2"
-        app:layout_constraintBottom_toBottomOf="@id/lblDOB"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/lblDOB" />
-
-    <!-- EMAIL ROW -->
-    <TextView
-        android:id="@+id/lblEmail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="Email"
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:text="SAVE CHANGES"
         android:textColor="#FFFFFF"
-        android:textSize="16sp"
+        android:textStyle="bold"
+        android:backgroundTint="#2D9CDB"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginEnd="60dp"
+        app:cornerRadius="20dp"
+        app:layout_constraintTop_toBottomOf="@id/btnEdit"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lblDOB" />
-
-    <TextView
-        android:id="@+id/tvEmailValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="tjatayde@gmail.com"
-        android:textColor="#4A90E2"
-        app:layout_constraintBottom_toBottomOf="@id/lblEmail"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/lblEmail" />
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
