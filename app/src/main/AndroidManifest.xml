@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="true"/>
+    <uses-feature android:name="android.hardware.sensor.stepdetector" android:required="true"/>
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 
     <application
         android:allowBackup="true"
@@ -12,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HeronHealth"
         tools:targetApi="31">
+        <activity
+            android:name=".AddExerciseActivity"
+            android:exported="false" />
         <activity
             android:name=".FoodSearchActivity"
             android:exported="false" />
@@ -25,7 +31,7 @@
             android:name=".PersonalInfoActivity"
             android:exported="false" />
         <activity
-            android:name=".WelcomeActivity"
+            android:name=".MainActivity"
             android:exported="false" />
         <activity
             android:name=".DashboardActivity"
@@ -41,7 +47,7 @@
             android:exported="false"
             android:label="@string/title_activity_login" />
         <activity
-            android:name=".MainActivity"
+            android:name=".WelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

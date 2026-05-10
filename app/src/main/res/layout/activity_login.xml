@@ -70,23 +70,25 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:hint="Email"
                 app:boxBackgroundColor="#FFFFFF"
-                app:boxCornerRadiusTopStart="14dp"
-                app:boxCornerRadiusTopEnd="14dp"
-                app:boxCornerRadiusBottomStart="14dp"
                 app:boxCornerRadiusBottomEnd="14dp"
+                app:boxCornerRadiusBottomStart="14dp"
+                app:boxCornerRadiusTopEnd="14dp"
+                app:boxCornerRadiusTopStart="14dp"
                 app:boxStrokeColor="#2D9CDB"
-                app:startIconDrawable="@drawable/ic_face"
+                app:startIconDrawable="@drawable/ic_email"
                 app:startIconTint="#1A365D">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etUsername"
+                    android:id="@+id/etEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Username"
+                    android:inputType="textEmailAddress"
                     android:textColor="#2C3E50"
-                    android:inputType="text"
-                    android:paddingStart="40dp"/>
+                    android:paddingStart="40dp"
+                    android:background="#e8f6fc"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout

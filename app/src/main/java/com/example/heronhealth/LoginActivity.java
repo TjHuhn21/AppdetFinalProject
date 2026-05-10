@@ -1,6 +1,7 @@
 package com.example.heronhealth;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,7 +16,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class LoginActivity extends AppCompatActivity {
-    EditText etUsername, etPassword;
+    EditText etEmail, etPassword;
     Button btnLogin, btnSignup;
     AlertDialog.Builder builder;
 
@@ -30,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
-        etUsername = findViewById(R.id.etUsername);
+        etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
 
         btnLogin = findViewById(R.id.btnLogin);
@@ -50,16 +51,26 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(etUsername.getText().toString().isEmpty() || etPassword.getText().toString().isEmpty()){
+                if(etEmail.getText().toString().isEmpty() || etPassword.getText().toString().isEmpty()){
                     displayMessage("Input Error!", "Please fill all fields");
                     return;
                 }
+                if (!android.util.Patterns.EMAIL_ADDRESS.matcher(etEmail.getText().toString().trim()).matches()) {
+                    displayMessage("Invalid Email", "Please enter a valid email address.");
+                    return;
+                }
                 MyDatabaseHelper myDatabaseHelper = new MyDatabaseHelper(LoginActivity.this);
-                boolean userMatch = myDatabaseHelper.searchUser(etUsername.getText().toString().trim(), etPassword.getText().toString().trim());
+                boolean userMatch = myDatabaseHelper.searchUser(etEmail.getText().toString().trim(), etPassword.getText().toString().trim());
 
                 if (!userMatch){
                     displayMessage("LogIn Error!", "Incorrect username or password");
                 }else {
+                    SharedPreferences sharedPref = getSharedPreferences("HeronHealthPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+
+                    editor.putBoolean("isLoggedIn", true);
+                    editor.putString("userEmail", etEmail.getText().toString().trim());
+                    editor.apply();
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
@@ -71,6 +82,7 @@ public class LoginActivity extends AppCompatActivity {
         builder.setCancelable(true);
         builder.setTitle(title);
         builder.setMessage(message);
+        builder.setPositiveButton("OK", null);
         builder.show();
     }
 

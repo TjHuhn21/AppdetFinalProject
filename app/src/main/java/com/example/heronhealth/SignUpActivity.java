@@ -1,6 +1,7 @@
 package com.example.heronhealth;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -23,9 +24,9 @@ public class SignUpActivity extends AppCompatActivity {
     EditText etUsername, etPassword, etEmail, etBirthday ,etWeight, etHeight;
 
     Button btnRegister;
-    AlertDialog.Builder builder;
+    AlertDialog.Builder builder, successMessage;
 
-    Spinner spnrGender, spnrGoal;
+    Spinner spnrGender, spnrGoal, spnrActivityLevel;
 
     MyDatabaseHelper myDb;
 
@@ -50,6 +51,11 @@ public class SignUpActivity extends AppCompatActivity {
         ArrayAdapter<String> goalAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, goals);
         spnrGoal.setAdapter(goalAdapter);
 
+        spnrActivityLevel = findViewById(R.id.spActivityLevel);
+        String[] activityLevel = {"Not Very Active", "Lightly Active", "Active", "Very Active"};
+        ArrayAdapter<String> activityLevelAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, activityLevel);
+        spnrActivityLevel.setAdapter(activityLevelAdapter);
+
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         etEmail = findViewById(R.id.etEmail);
@@ -60,6 +66,7 @@ public class SignUpActivity extends AppCompatActivity {
 
         btnRegister= findViewById(R.id.btnRegister);
         builder = new AlertDialog.Builder(this);
+        successMessage = new AlertDialog.Builder(this);
         setEtBirthday();
         userRegister();
     }
@@ -75,6 +82,7 @@ public class SignUpActivity extends AppCompatActivity {
 
                 String gender = spnrGender.getSelectedItem().toString();
                 String goal = spnrGoal.getSelectedItem().toString();
+                String activityLevel = spnrActivityLevel.getSelectedItem().toString();
 
                 if (username.isEmpty() || password.isEmpty() || email.isEmpty() ||
                         birthday.isEmpty() || etWeight.getText().toString().isEmpty() ||
@@ -100,10 +108,6 @@ public class SignUpActivity extends AppCompatActivity {
                     displayMessage("Invalid Email", "Please enter a valid email address.");
                     return;
                 }
-                if (password.length() < 6) {
-                    displayMessage("Weak Password", "Password must be at least 6 characters.");
-                    return;
-                }
                 if (userAge < 14 || userAge > 120) {
                     displayMessage("Age Restriction", "You must be at least 14 years old.");
                     return;
@@ -121,14 +125,26 @@ public class SignUpActivity extends AppCompatActivity {
                     return;
                 }
 
-                boolean success = myDb.addUser(username, password, email,birthday, gender, weight, height, goal);
+                boolean success = myDb.addUser(username, password, email,birthday, gender, weight, height, goal, activityLevel);
 
                 if (success) {
-                    displayMessage("Success", "Welcome to HeronHealth!");
-                    Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                    finish();
+                    successMessage.setCancelable(false);
+                    successMessage.setTitle("Success");
+                    successMessage.setMessage("Welcome to HeronHealth!");
+
+                    successMessage.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+
+                    successMessage.show();
+
                 } else {
+                    successMessage.setCancelable(true);
                     displayMessage("Error", "Username or Email already exists.");
                 }
             }

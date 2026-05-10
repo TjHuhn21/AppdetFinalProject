@@ -1,12 +1,21 @@
 package com.example.heronhealth;
 
+import static android.app.ProgressDialog.show;
+
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,6 +33,12 @@ public class MoreOptionFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    Button btnLogout;
+    LinearLayout personalInfo, deleteAcc;
+    View view;
+
+    AlertDialog.Builder builder;
+    MyDatabaseHelper myDb;
     public MoreOptionFragment() {
         // Required empty public constructor
     }
@@ -59,6 +74,63 @@ public class MoreOptionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_more_option, container, false);
+        view = inflater.inflate(R.layout.fragment_more_option, container, false);
+
+        personalInfo = view.findViewById(R.id.itemPersonalInfo);
+        deleteAcc = view.findViewById(R.id.itemDeleteAccount);
+        btnLogout = view.findViewById(R.id.btnLogout);
+        builder = new AlertDialog.Builder(requireContext());
+        myDb = new MyDatabaseHelper(requireContext());
+        personalInfo.setOnClickListener(view -> {
+            Intent intent = new Intent(getActivity(), PersonalInfoActivity.class);
+            startActivity(intent);
+
+        });
+        deleteAcc.setOnClickListener(view1 -> {
+
+            builder.setTitle("Confirm Delete")
+                    .setMessage("Are you sure you want to delete your account? This will permanently delete your account.");
+                    builder.setCancelable(false).setPositiveButton("Yes, Delete", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            SharedPreferences sharedPref = requireActivity().getSharedPreferences("HeronHealthPrefs", android.content.Context.MODE_PRIVATE);
+                            String email = sharedPref.getString("userEmail", "");
+
+                            if (!email.isEmpty()) {
+                                boolean isDeleted = myDb.softDeleteUser(email);
+
+                                if (isDeleted) {
+                                    Toast.makeText(getContext(), "Account Deleted", Toast.LENGTH_SHORT).show();
+                                    logoutUser();
+
+
+                                }
+                            }
+
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
+        });
+        btnLogout.setOnClickListener(view1 -> {
+            logoutUser();
+        });
+        return  view;
+    }
+    private void logoutUser() {
+        SharedPreferences sharedPref = requireActivity().getSharedPreferences("HeronHealthPrefs", android.content.Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear();
+        editor.apply();
+
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 }

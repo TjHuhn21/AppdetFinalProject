@@ -1,9 +1,11 @@
 package com.example.heronhealth;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,12 +22,22 @@ import java.util.ArrayList;
 public class WelcomeActivity extends AppCompatActivity {
 
     ImageSlider imageSlider;
-    Button btnSignUp, btnLogIn;
+    Button btnSignUp;
+    TextView btnLogIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        SharedPreferences sharedPreferences = getSharedPreferences("HeronHealthPrefs", MODE_PRIVATE);
+        boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
+
+        if (isLoggedIn){
+            Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
         setContentView(R.layout.activity_welcome);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
