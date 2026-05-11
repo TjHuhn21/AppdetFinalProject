@@ -238,7 +238,7 @@
 
     </androidx.cardview.widget.CardView>
 
-    <!-- EDIT BUTTON -->
+    <!-- EDIT BUTTON
 
     <Button
         android:id="@+id/btnEdit"
@@ -254,7 +254,8 @@
         app:cornerRadius="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardInfo" />
+        app:layout_constraintTop_toBottomOf="@id/cardInfo" />j-->
+
 
     <!-- SAVE BUTTON -->
 
@@ -263,7 +264,7 @@
         android:layout_width="0dp"
         android:layout_height="55dp"
         android:layout_marginStart="60dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="60dp"
         android:backgroundTint="#2D9CDB"
         android:text="SAVE CHANGES"
@@ -273,6 +274,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnEdit" />
+        app:layout_constraintTop_toBottomOf="@id/cardInfo"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -112,12 +112,13 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- QUICK ADD BUTTONS -->
+    <!-- BUTTONS -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="40dp"
+        android:gravity="center"
         android:orientation="horizontal"
         android:weightSum="4"
         app:layout_constraintTop_toBottomOf="@+id/cardMonitor">
@@ -125,51 +126,52 @@
         <Button
             android:id="@+id/btnAdd250"
             android:layout_width="0dp"
-            android:layout_height="60dp"
+            android:layout_height="56dp"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
             android:backgroundTint="#beebfa"
             android:text="+250\nml"
+            android:textAlignment="center"
             android:textColor="#2D9CDB"
-            android:elevation="0dp"
-            android:textSize="12sp"
+            android:textSize="11sp"
             app:cornerRadius="16dp"/>
 
         <Button
             android:id="@+id/btnAdd500"
             android:layout_width="0dp"
-            android:layout_height="60dp"
+            android:layout_height="56dp"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
             android:backgroundTint="#beebfa"
             android:text="+500\nml"
+            android:textAlignment="center"
             android:textColor="#2D9CDB"
-            android:elevation="0dp"
-            android:textSize="12sp"
+            android:textSize="11sp"
             app:cornerRadius="16dp"/>
 
         <Button
             android:id="@+id/btnAdd1000"
             android:layout_width="0dp"
-            android:layout_height="60dp"
+            android:layout_height="56dp"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
             android:backgroundTint="#beebfa"
             android:text="+1000\nml"
+            android:textAlignment="center"
             android:textColor="#2D9CDB"
-            android:elevation="0dp"
-            android:textSize="12sp"
+            android:textSize="11sp"
             app:cornerRadius="16dp"/>
 
         <Button
             android:id="@+id/btnCustom"
             android:layout_width="0dp"
-            android:layout_height="60dp"
+            android:layout_height="56dp"
             android:layout_weight="1"
             android:backgroundTint="#2D9CDB"
             android:text="Custom"
+            android:textAlignment="center"
             android:textColor="#FFFFFF"
-            android:textSize="12sp"
+            android:textSize="11sp"
             app:cornerRadius="16dp"/>
     </LinearLayout>
 

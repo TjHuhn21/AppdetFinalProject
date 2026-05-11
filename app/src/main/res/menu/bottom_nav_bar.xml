@@ -1,16 +1,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
         android:id="@+id/dashboard"
-        android:icon="@drawable/dashboard"
-        android:title="Dashboard" />
+        android:icon="@drawable/ic_dashboard"
+        android:title="Dashboard"
+        app:showAsAction="ifRoom" />
+
     <item
         android:id="@+id/log"
-        android:icon="@drawable/clipboard"
-        android:title="Food Log" />
-    <!-- Empty item to create space for the Floating Action Button -->
+        android:icon="@drawable/ic_restaurant"
+        android:title="Log"
+        app:showAsAction="ifRoom" />
+
     <item
         android:id="@+id/nav_more"
-        android:icon="@drawable/menu"
-        android:title="More" />
+        android:icon="@drawable/ic_more"
+        android:title="More"
+        app:showAsAction="ifRoom" />
+
 </menu>

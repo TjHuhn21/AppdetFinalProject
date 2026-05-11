@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121826">
+    android:background="#beebfa">
 
     <!-- CLOSE BUTTON -->
     <ImageButton
@@ -15,7 +15,7 @@
         android:layout_marginTop="12dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@android:drawable/ic_menu_close_clear_cancel"
-        app:tint="#FFFFFF"
+        app:tint="#1A365D"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,7 +27,7 @@
         android:layout_marginEnd="12dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@android:drawable/checkbox_on_background"
-        app:tint="#4DA3FF"
+        app:tint="#2D9CDB"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="@+id/btnClose" />
@@ -38,14 +38,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Log Workout"
-        android:textColor="#FFFFFF"
+        android:textColor="#1A365D"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/btnClose"
         app:layout_constraintTop_toTopOf="@+id/btnClose"
         app:layout_constraintBottom_toBottomOf="@+id/btnClose" />
 
-    <!-- Exercise Name -->
+    <!-- EXERCISE NAME -->
     <TextView
         android:id="@+id/tvNameLabel"
         android:layout_width="wrap_content"
@@ -53,7 +53,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="32dp"
         android:text="Exercise Name"
-        android:textColor="#FFFFFF"
+        android:textColor="#1A365D"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnClose" />
@@ -66,8 +66,8 @@
         android:gravity="end"
         android:inputType="textCapWords"
         android:hint="e.g. Bench Press"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#888888"
+        android:textColor="#2D9CDB"
+        android:textColorHint="#7dbed4"
         android:textSize="18sp"
         app:layout_constraintTop_toTopOf="@id/tvNameLabel"
         app:layout_constraintBottom_toBottomOf="@id/tvNameLabel"
@@ -78,13 +78,13 @@
         android:id="@+id/divider0"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="#444444"
+        android:background="#7dbed4"
         android:layout_marginTop="20dp"
         app:layout_constraintTop_toBottomOf="@id/tvNameLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Sets -->
+    <!-- SETS -->
     <TextView
         android:id="@+id/tvSetsLabel"
         android:layout_width="wrap_content"
@@ -92,7 +92,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="28dp"
         android:text="# of Sets"
-        android:textColor="#FFFFFF"
+        android:textColor="#1A365D"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider0" />
@@ -104,7 +104,7 @@
         android:background="@android:color/transparent"
         android:gravity="end"
         android:inputType="number"
-        android:textColor="#FFFFFF"
+        android:textColor="#2D9CDB"
         android:textSize="22sp"
         android:text="3"
         app:layout_constraintTop_toTopOf="@id/tvSetsLabel"
@@ -116,13 +116,13 @@
         android:id="@+id/divider1"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="#444444"
+        android:background="#7dbed4"
         android:layout_marginTop="20dp"
         app:layout_constraintTop_toBottomOf="@id/tvSetsLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Repetitions -->
+    <!-- REPS -->
     <TextView
         android:id="@+id/tvRepsLabel"
         android:layout_width="wrap_content"
@@ -130,7 +130,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="28dp"
         android:text="Repetitions / Set"
-        android:textColor="#FFFFFF"
+        android:textColor="#1A365D"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider1" />
@@ -143,7 +143,7 @@
         android:gravity="end"
         android:inputType="number"
         android:text="10"
-        android:textColor="#FFFFFF"
+        android:textColor="#2D9CDB"
         android:textSize="22sp"
         app:layout_constraintTop_toTopOf="@id/tvRepsLabel"
         app:layout_constraintBottom_toBottomOf="@id/tvRepsLabel"
@@ -154,13 +154,13 @@
         android:id="@+id/divider2"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="#444444"
+        android:background="#7dbed4"
         android:layout_marginTop="20dp"
         app:layout_constraintTop_toBottomOf="@id/tvRepsLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Weight -->
+    <!-- WEIGHT -->
     <TextView
         android:id="@+id/tvWeightLabel"
         android:layout_width="wrap_content"
@@ -168,7 +168,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="28dp"
         android:text="Weight per Rep (kg)"
-        android:textColor="#FFFFFF"
+        android:textColor="#1A365D"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider2" />
@@ -180,10 +180,10 @@
         android:background="@android:color/transparent"
         android:gravity="end"
         android:inputType="numberDecimal"
-        android:hint="0"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#888888"
+        android:textColor="#2D9CDB"
         android:textSize="22sp"
+        android:hint="0"
+        android:textColorHint="#7dbed4"
         app:layout_constraintTop_toTopOf="@id/tvWeightLabel"
         app:layout_constraintBottom_toBottomOf="@id/tvWeightLabel"
         app:layout_constraintEnd_toEndOf="parent"
@@ -193,13 +193,13 @@
         android:id="@+id/divider3"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="#444444"
+        android:background="#7dbed4"
         android:layout_marginTop="20dp"
         app:layout_constraintTop_toBottomOf="@id/tvWeightLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Calories Burned -->
+    <!-- CALORIES -->
     <TextView
         android:id="@+id/tvCaloriesLabel"
         android:layout_width="wrap_content"
@@ -207,7 +207,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="28dp"
         android:text="Calories Burned"
-        android:textColor="#FFFFFF"
+        android:textColor="#1A365D"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider3" />
@@ -220,8 +220,8 @@
         android:gravity="end"
         android:hint="Auto"
         android:inputType="number"
-        android:textColor="#4DA3FF"
-        android:textColorHint="#4DA3FF"
+        android:textColor="#2D9CDB"
+        android:textColorHint="#2D9CDB"
         android:textSize="22sp"
         app:layout_constraintTop_toTopOf="@id/tvCaloriesLabel"
         app:layout_constraintBottom_toBottomOf="@id/tvCaloriesLabel"
@@ -232,13 +232,12 @@
         android:id="@+id/divider4"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="#444444"
+        android:background="#7dbed4"
         android:layout_marginTop="20dp"
         app:layout_constraintTop_toBottomOf="@id/tvCaloriesLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Helper note -->
     <TextView
         android:id="@+id/tvCaloriesHint"
         android:layout_width="0dp"
@@ -246,7 +245,7 @@
         android:layout_marginHorizontal="24dp"
         android:layout_marginTop="8dp"
         android:text="Leave calories blank to auto-estimate based on sets, reps, and weight."
-        android:textColor="#888888"
+        android:textColor="#000000"
         android:textSize="12sp"
         app:layout_constraintTop_toBottomOf="@id/divider4"
         app:layout_constraintStart_toStartOf="parent"
