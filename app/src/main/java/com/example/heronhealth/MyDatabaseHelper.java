@@ -17,7 +17,7 @@ import java.util.ArrayList;
 class MyDatabaseHelper extends SQLiteOpenHelper {
     private Context context;
     private static final String DATABASE_NAME = "HeronHealth.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5;
 
     private static final String TABLE_NAME = "heron_User";
     private static final String COLUMN_ID = "user_ID";
@@ -30,6 +30,7 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_HEIGHT = "user_height";
     private static final String COLUMN_GOAL = "user_goal";
     private static final String COLUMN_ACTIVITY_LEVEL = "user_activity_level";
+    private static final String COLUMN_PROFILE_IMAGE = "user_profile_image";
 
     private static final String COLUMN_IS_DELETED = "is_deleted";
 
@@ -104,6 +105,7 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_PROTEIN_GOAL + " INTEGER, "
                 + COLUMN_WATER_GOAL + " INTEGER, "
                 + COLUMN_STEP_GOAL + " INTEGER, "
+                + COLUMN_PROFILE_IMAGE + " TEXT, " // Add this line
                 + COLUMN_IS_DELETED + " INTEGER DEFAULT 0)";
         db.execSQL(CREATE_USER_TABLE);
         //Food library
@@ -404,7 +406,7 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
 
         String[] projection = { COLUMN_ID };
 
-        String selection = COLUMN_EMAIL + " = ?" + " AND " + COLUMN_PASSWORD + " = ?";
+        String selection = COLUMN_EMAIL + " = ? AND " + COLUMN_PASSWORD + " = ? AND " + COLUMN_IS_DELETED + " = 0";
 
         String[] selectionArgs = { email, password };
 
@@ -423,6 +425,15 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
 
         return count > 0;
+    }
+    public boolean updateUserImage(String email, String imageUri) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COLUMN_PROFILE_IMAGE, imageUri);
+
+        int result = db.update(TABLE_NAME, cv, COLUMN_EMAIL + " = ?", new String[]{email});
+        db.close();
+        return result > 0;
     }
     public boolean softDeleteUser(String email){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -444,13 +455,15 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_WEIGHT + ", " + COLUMN_BIRTHDAY + ", " + COLUMN_GENDER + ", " +
                 COLUMN_GOAL + ", " + COLUMN_ACTIVITY_LEVEL + ", " +
                 COLUMN_CALORIE_GOAL + ", " + COLUMN_PROTEIN_GOAL + ", " +
-                COLUMN_WATER_GOAL + ", " + COLUMN_STEP_GOAL +
+                COLUMN_WATER_GOAL + ", " + COLUMN_STEP_GOAL + ", " +
+                COLUMN_PROFILE_IMAGE +
                 " FROM " + TABLE_NAME + " WHERE " + COLUMN_EMAIL + " = ?";
 
         Cursor cursor = db.rawQuery(query, new String[]{email});
 
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
+                // Pass all 13 fields directly into the constructor
                 userList.add(new PersonalInfo(
                         cursor.getString(0),  // name
                         cursor.getString(1),  // email
@@ -463,7 +476,8 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                         cursor.getInt(8),     // calorie goal
                         cursor.getInt(9),     // protein goal
                         cursor.getInt(10),    // water goal
-                        cursor.getInt(11)     // step goal
+                        cursor.getInt(11),    // step goal
+                        cursor.getString(12)  // imageUri (The 13th argument)
                 ));
                 cursor.moveToNext();
             }

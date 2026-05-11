@@ -1,14 +1,18 @@
 package com.example.heronhealth;
 
 import android.app.DatePickerDialog;
+import android.app.Instrumentation;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -16,6 +20,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.heronhealth.model.PersonalInfo;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import android.net.Uri;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,6 +34,21 @@ public class PersonalInfoActivity extends AppCompatActivity {
     private Button btnSave;
     private MyDatabaseHelper myDb;
     private String currentUserEmail;
+
+    private ImageView imgProfile;
+    private Uri selectedImageUri;
+    ActivityResultLauncher<Intent> imagePickLauncher;
+
+    private final ActivityResultLauncher<String> pickImageLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null) {
+                    selectedImageUri = uri;
+                    imgProfile.setImageURI(uri);
+                    // Optional: Grant persistable permission if you want to load this URI later
+                    getContentResolver().takePersistableUriPermission(uri,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +71,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
                 }
         );
 
+
         myDb = new MyDatabaseHelper(this);
 
         SharedPreferences sharedPref =
@@ -62,6 +85,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
         tvEmailValue    = findViewById(R.id.tvEmailValue);
         tvWeightValue   = findViewById(R.id.tvWeightValue);
         btnSave         = findViewById(R.id.btnSave);
+        imgProfile = findViewById(R.id.imgProfile);
 
         loadData();
 
@@ -78,16 +102,17 @@ public class PersonalInfoActivity extends AppCompatActivity {
         tvDOBValue.setOnClickListener(v -> showDatePickerDialog());
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        imgProfile.setOnClickListener(v -> {
+            pickImageLauncher.launch("image/*");
+        });
 
         btnSave.setOnClickListener(v -> saveProfile());
     }
 
     private void loadData() {
-
         ArrayList<PersonalInfo> users = myDb.getUserList(currentUserEmail);
 
         if (!users.isEmpty()) {
-
             PersonalInfo info = users.get(0);
 
             tvUsernameValue.setText(info.getName());
@@ -95,6 +120,16 @@ public class PersonalInfoActivity extends AppCompatActivity {
             tvWeightValue.setText(info.getWeight());
             tvDOBValue.setText(info.getDateOfBirth());
             tvEmailValue.setText(info.getEmail());
+
+            // LOAD THE IMAGE
+            if (info.getImageUri() != null && !info.getImageUri().isEmpty()) {
+                try {
+                    imgProfile.setImageURI(android.net.Uri.parse(info.getImageUri()));
+                } catch (Exception e) {
+                    // Fallback if URI is invalid or permission is lost
+                    imgProfile.setImageResource(R.drawable.baseline_account_circle_24);
+                }
+            }
         }
     }
 
@@ -114,6 +149,9 @@ public class PersonalInfoActivity extends AppCompatActivity {
         if (!isValidDecimal(newWeight)) {
             Toast.makeText(this, "Please enter a valid weight.", Toast.LENGTH_SHORT).show();
             return;
+        }
+        if (selectedImageUri != null) {
+            myDb.updateUserImage(currentUserEmail, selectedImageUri.toString());
         }
 
         // Save name, height, DOB to user table

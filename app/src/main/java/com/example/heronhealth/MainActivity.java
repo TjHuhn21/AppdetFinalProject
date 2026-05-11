@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         replaceFragment(new DashboardFragment());
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {

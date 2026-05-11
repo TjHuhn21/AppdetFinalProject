@@ -15,11 +15,15 @@ public class PersonalInfo {
     private int proteinGoal;
     private int waterGoal;
     private int stepGoal;
+    private String imageUri;
+
+    public String getImageUri() { return imageUri; }
+    public void setImageUri(String imageUri) { this.imageUri = imageUri; }
 
     // Full Constructor
     public PersonalInfo(String name, String email, String height, String weight,
                         String dateOfBirth, String gender, String goal, String activityLevel,
-                        int calorieGoal, int proteinGoal, int waterGoal, int stepGoal) {
+                        int calorieGoal, int proteinGoal, int waterGoal, int stepGoal, String imageUri) {
         this.name = name;
         this.email = email;
         this.height = height;
@@ -32,6 +36,7 @@ public class PersonalInfo {
         this.proteinGoal = proteinGoal;
         this.waterGoal = waterGoal;
         this.stepGoal = stepGoal;
+        this.imageUri = imageUri;
     }
 
     public String getName() { return name; }

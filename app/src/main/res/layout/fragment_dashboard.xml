@@ -461,5 +461,12 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <ImageView
+            android:layout_height="100dp"
+            android:layout_width="match_parent"
+            android:src="@drawable/fly"
+            android:layout_marginTop="40dp"
+            />
+
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
