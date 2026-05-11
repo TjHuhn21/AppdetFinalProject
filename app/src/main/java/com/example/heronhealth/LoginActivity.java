@@ -51,6 +51,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //validation
                 if(etEmail.getText().toString().isEmpty() || etPassword.getText().toString().isEmpty()){
                     displayMessage("Input Error!", "Please fill all fields");
                     return;
@@ -59,9 +60,11 @@ public class LoginActivity extends AppCompatActivity {
                     displayMessage("Invalid Email", "Please enter a valid email address.");
                     return;
                 }
+                //check if user exists
                 MyDatabaseHelper myDatabaseHelper = new MyDatabaseHelper(LoginActivity.this);
                 boolean userMatch = myDatabaseHelper.searchUser(etEmail.getText().toString().trim(), etPassword.getText().toString().trim());
 
+                //if usermatch it logs in and if not present error message
                 if (!userMatch){
                     displayMessage("LogIn Error!", "Incorrect username or password");
                 }else {

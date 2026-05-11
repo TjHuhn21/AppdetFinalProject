@@ -11,6 +11,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -53,6 +54,7 @@ public class DashboardFragment extends Fragment implements SensorEventListener {
     // Calories
     private ProgressBar progressCaloriesBar;
     private TextView tvRemainingValue, tvBaseGoal, tvFoodEaten, tvProteinLabel;
+    private ImageView imgBackgroundWorkout;
 
     // Steps
     private ProgressBar pbStepsProgress;
@@ -120,17 +122,20 @@ public class DashboardFragment extends Fragment implements SensorEventListener {
                              Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_dashboard, container, false);
+        //ask permision four physcial actibede
         if (ContextCompat.checkSelfPermission(requireContext(),
                 android.Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(),
                     new String[]{android.Manifest.permission.ACTIVITY_RECOGNITION}, 1);
         }
 
+        //get date today
         todayDate = new SimpleDateFormat(
                 "yyyy-MM-dd",
                 Locale.getDefault()
         ).format(new Date());
 
+        //get the last log date for sharedpref
         SharedPreferences sharedPref = requireActivity()
                 .getSharedPreferences("HeronHealthPrefs", Context.MODE_PRIVATE);
 
@@ -146,8 +151,10 @@ public class DashboardFragment extends Fragment implements SensorEventListener {
 
         initialize();
 
+        //get the current user email
         currentUserEmail = sharedPref.getString("userEmail", "");
 
+        //check if log exists
         myDb.checkAndInitDailyLog(currentUserEmail, todayDate);
 
         // Seed the weight chart with the registration weight on first install
@@ -197,18 +204,17 @@ public class DashboardFragment extends Fragment implements SensorEventListener {
         }
     }
 
-    // Clean up your code by putting the registration logic in one place
     private void registerStepSensor() {
         if (stepCounterSensor != null && sensorManager != null) {
             sensorManager.registerListener(this, stepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
     }
 
-    /**
-     * On first install, the weight_progress table is empty.
-     * We seed it with the weight the user entered at registration
-     * so the chart always has a starting point.
-     */
+
+     //On first install, the weight_progress table is empty.
+     //We seed it with the weight the user entered at registration
+     //so the chart always has a starting point.
+
     private void seedInitialWeightIfNeeded(SharedPreferences sharedPref) {
 
         boolean alreadySeeded = sharedPref.getBoolean(PREF_WEIGHT_SEEDED, false);
@@ -263,7 +269,8 @@ public class DashboardFragment extends Fragment implements SensorEventListener {
 
         // Workout
         tvRecentWorkoutStatus = view.findViewById(R.id.tvRecentWorkoutStatus);
-        btnLogWorkout         = view.findViewById(R.id.btnLogWorkout);
+        imgBackgroundWorkout = view.findViewById(R.id.bgWorkout);
+        btnLogWorkout = view.findViewById(R.id.btnLogWorkout);
 
         // Weight
         weightLineChart = view.findViewById(R.id.weightLineChart);
@@ -336,6 +343,8 @@ public class DashboardFragment extends Fragment implements SensorEventListener {
                 sb.append("• ").append(w).append("\n");
             }
             tvRecentWorkoutStatus.setText(sb.toString().trim());
+            imgBackgroundWorkout.setImageResource(R.drawable.heronawake);
+
         }
     }
 

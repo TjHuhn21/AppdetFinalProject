@@ -41,16 +41,20 @@ public class SignUpActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        //set the options for spinner gender
         spnrGender = findViewById(R.id.spGender);
         String[] genders = {"Male", "Female"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, genders);
         spnrGender.setAdapter(adapter);
 
+        //same here
         spnrGoal = findViewById(R.id.spGoal);
         String[] goals = {"Lose Weight", "Maintain", "Gain Muscle"};
         ArrayAdapter<String> goalAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, goals);
         spnrGoal.setAdapter(goalAdapter);
 
+
+        //same here
         spnrActivityLevel = findViewById(R.id.spActivityLevel);
         String[] activityLevel = {"Not Very Active", "Lightly Active", "Active", "Very Active"};
         ArrayAdapter<String> activityLevelAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, activityLevel);
@@ -84,6 +88,7 @@ public class SignUpActivity extends AppCompatActivity {
                 String goal = spnrGoal.getSelectedItem().toString();
                 String activityLevel = spnrActivityLevel.getSelectedItem().toString();
 
+                //validations
                 if (username.isEmpty() || password.isEmpty() || email.isEmpty() ||
                         birthday.isEmpty() || etWeight.getText().toString().isEmpty() ||
                         etHeight.getText().toString().isEmpty()) {
@@ -125,6 +130,7 @@ public class SignUpActivity extends AppCompatActivity {
                     return;
                 }
 
+                //add user to database
                 boolean success = myDb.addUser(username, password, email,birthday, gender, weight, height, goal, activityLevel);
 
                 if (success) {
@@ -154,12 +160,13 @@ public class SignUpActivity extends AppCompatActivity {
         etBirthday.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //get date today
                 Calendar c = Calendar.getInstance();
                 int year = c.get(Calendar.YEAR);
                 int month = c.get(Calendar.MONTH);
                 int day = c.get(Calendar.DAY_OF_MONTH);
 
-
+                //creates the date picker
                 DatePickerDialog datePickerDialog = new DatePickerDialog(SignUpActivity.this, new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {

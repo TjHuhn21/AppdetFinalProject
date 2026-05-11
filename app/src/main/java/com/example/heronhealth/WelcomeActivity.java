@@ -32,6 +32,7 @@ public class WelcomeActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("HeronHealthPrefs", MODE_PRIVATE);
         boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
 
+        //check if user is logged in and if so straight to the dashboard
         if (isLoggedIn){
             Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
             startActivity(intent);
@@ -49,10 +50,12 @@ public class WelcomeActivity extends AppCompatActivity {
         btnLogIn = findViewById(R.id.btnLogin);
         ArrayList<SlideModel> slideModels = new ArrayList<>();
 
+        //add image
         slideModels.add(new SlideModel(R.drawable.heronwork, ScaleTypes.FIT));
         slideModels.add(new SlideModel(R.drawable.heroneat, ScaleTypes.FIT));
         slideModels.add(new SlideModel(R.drawable.heronrest, ScaleTypes.FIT));
 
+        //setting image list
         imageSlider.setImageList(slideModels, ScaleTypes.FIT);
 
         btnSignUp.setOnClickListener(new View.OnClickListener() {
