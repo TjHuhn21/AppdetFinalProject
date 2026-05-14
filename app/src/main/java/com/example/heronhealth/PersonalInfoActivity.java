@@ -56,17 +56,9 @@ public class PersonalInfoActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_personal_info);
 
-        ViewCompat.setOnApplyWindowInsetsListener(
-                findViewById(R.id.main),
-                (v, insets) -> {
-                    Insets systemBars =
-                            insets.getInsets(WindowInsetsCompat.Type.systemBars());
-                    v.setPadding(
-                            systemBars.left,
-                            systemBars.top,
-                            systemBars.right,
-                            systemBars.bottom
-                    );
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main),
+                (v, insets) -> {Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                    v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
                     return insets;
                 }
         );
@@ -181,10 +173,10 @@ public class PersonalInfoActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Pulls the user's full profile and recalculates all goals
-     * using the new weight/height. Saves updated goals to DB.
-     */
+
+     //Pulls the user's full profile and recalculates all goals
+     //using the new weight/height. Saves updated goals to DB.
+
     private void recalculateGoals(String newWeight, String newHeight, String newDob) {
 
         ArrayList<PersonalInfo> users = myDb.getUserList(currentUserEmail);
