@@ -8,6 +8,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.EditText;
@@ -34,6 +35,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,7 +43,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class DashboardFragment extends Fragment implements SensorEventListener {
+public class DashboardFragment extends Fragment{
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -82,13 +84,9 @@ public class DashboardFragment extends Fragment implements SensorEventListener {
     private int stepGoal;
     private int currentWaterValue = 0;
 
-    // Sensors
-    private SensorManager sensorManager;
-    private Sensor stepCounterSensor;
-
-    // Step tracking
-    // FIX: use -1 as "not yet set" sentinel stored in prefs
     private String todayDate;
+
+    private MaterialCardView caloriesCardView;
 
     private static final String PREF_STEPS_OFFSET    = "steps_at_start_of_day";
     private static final String PREF_LAST_LOG_DATE   = "last_log_date";
@@ -129,6 +127,13 @@ public class DashboardFragment extends Fragment implements SensorEventListener {
                     new String[]{android.Manifest.permission.ACTIVITY_RECOGNITION}, 1);
         }
 
+        Intent serviceIntent = new Intent(getContext(), StepCounterService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            requireContext().startForegroundService(serviceIntent);
+        } else {
+            requireContext().startService(serviceIntent);
+        }
+
         //get date today
         todayDate = new SimpleDateFormat(
                 "yyyy-MM-dd",
@@ -162,6 +167,13 @@ public class DashboardFragment extends Fragment implements SensorEventListener {
 
         checkAndLoadData();
 
+        //Calories
+
+        caloriesCardView.setOnClickListener(view1 -> {
+            Intent intent = new Intent(getContext(), NutritionActivity.class);
+            startActivity(intent);
+        });
+
         // --- Water ---
         btnUpdateWater.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), WaterAddActivity.class);
@@ -185,10 +197,6 @@ public class DashboardFragment extends Fragment implements SensorEventListener {
         // --- Step Goal Edit ---
         btnEditStepGoal.setOnClickListener(v -> showEditStepGoalDialog());
 
-        if (stepCounterSensor == null) {
-            tvStepCountValue.setText("N/A");
-        }
-
         return view;
     }
     @Override
@@ -197,16 +205,9 @@ public class DashboardFragment extends Fragment implements SensorEventListener {
         if (requestCode == 1) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted! Start the sensor immediately
-                registerStepSensor();
             } else {
                 Toast.makeText(getContext(), "Permission denied. Steps cannot be tracked.", Toast.LENGTH_SHORT).show();
             }
-        }
-    }
-
-    private void registerStepSensor() {
-        if (stepCounterSensor != null && sensorManager != null) {
-            sensorManager.registerListener(this, stepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
     }
 
@@ -249,6 +250,7 @@ public class DashboardFragment extends Fragment implements SensorEventListener {
     private void initialize() {
 
         // Calories
+        caloriesCardView = view.findViewById(R.id.cardCalories);
         progressCaloriesBar = view.findViewById(R.id.progressCaloriesBar);
         tvRemainingValue    = view.findViewById(R.id.tvRemainingValue);
         tvBaseGoal          = view.findViewById(R.id.tvBaseGoal);
@@ -277,14 +279,6 @@ public class DashboardFragment extends Fragment implements SensorEventListener {
         btnAddWeight    = view.findViewById(R.id.btnAddWeight);
 
         myDb = new MyDatabaseHelper(requireContext());
-
-        sensorManager = (SensorManager)
-                requireContext().getSystemService(Context.SENSOR_SERVICE);
-
-        if (sensorManager != null) {
-            stepCounterSensor =
-                    sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        }
     }
 
     private void refreshDashboardStats() {
@@ -463,14 +457,6 @@ public class DashboardFragment extends Fragment implements SensorEventListener {
     public void onResume() {
         super.onResume();
 
-        // FIX: re-register sensor every onResume — this is what makes steps update live
-        if (stepCounterSensor != null && sensorManager != null) {
-            sensorManager.registerListener(
-                    this,
-                    stepCounterSensor,
-                    SensorManager.SENSOR_DELAY_NORMAL   // SENSOR_DELAY_NORMAL is better than UI for steps
-            );
-        }
 
         refreshDashboardStats();
     }
@@ -478,52 +464,8 @@ public class DashboardFragment extends Fragment implements SensorEventListener {
     @Override
     public void onPause() {
         super.onPause();
-
-        if (sensorManager != null) {
-            sensorManager.unregisterListener(this);
-        }
     }
 
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() != Sensor.TYPE_STEP_COUNTER) return;
-
-        int totalStepsSinceReboot = (int) event.values[0];
-        SharedPreferences sharedPref = requireActivity().getSharedPreferences("HeronHealthPrefs", Context.MODE_PRIVATE);
-
-        int savedOffset = sharedPref.getInt(PREF_STEPS_OFFSET, -1);
-
-        if (savedOffset == -1 || totalStepsSinceReboot < savedOffset) {
-            savedOffset = totalStepsSinceReboot;
-            sharedPref.edit().putInt(PREF_STEPS_OFFSET, savedOffset).apply();
-        }
-
-        int stepsToday = totalStepsSinceReboot - savedOffset;
-
-        // --- FIX STARTS HERE ---
-        // Use a post() or ensure you are on the Main Thread for UI
-        if (isAdded() && getView() != null) {
-            requireActivity().runOnUiThread(() -> {
-                tvStepCountValue.setText(String.valueOf(stepsToday));
-
-                // Ensure the progress bar is actually using the latest Max
-                pbStepsProgress.setProgress(stepsToday);
-
-                // Debug: Check if the Max is what you expect
-                // Log.d("STEP_DEBUG", "Steps: " + stepsToday + " Max: " + pbStepsProgress.getMax());
-            });
-        }
-
-        // Optimization: Only update DB every 5 steps to prevent lag
-        if (stepsToday % 5 == 0) {
-            myDb.updateDailyValue(currentUserEmail, todayDate, MyDatabaseHelper.COL_CUR_STEPS, stepsToday);
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Not needed
-    }
 
     private void calculateInitialGoals(PersonalInfo user) {
 
