@@ -196,7 +196,6 @@ public class FoodLogFragment extends Fragment {
         container.removeAllViews();
 
         if (entries.isEmpty()) {
-
             TextView empty = new TextView(requireContext());
             empty.setText("Nothing logged yet.");
             empty.setTextColor(0xFF7A8A99);
@@ -220,6 +219,37 @@ public class FoodLogFragment extends Fragment {
             tv.setTextColor(0xFF2C3E50);
             tv.setTextSize(13f);
             tv.setPadding(0, 6, 0, 6);
+
+            // Make it visually interactable (optional but nice)
+            tv.setClickable(true);
+            tv.setFocusable(true);
+
+            // LONG CLICK TO DELETE
+            tv.setOnLongClickListener(v -> {
+                new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                        .setTitle("Delete Entry")
+                        .setMessage("Are you sure you want to remove \"" + food.getName() + "\"?")
+                        .setPositiveButton("Delete", (dialog, which) -> {
+
+
+                            boolean isDeleted = myDb.deleteFoodEntry(food.getId(), currentUserEmail, getSelectedDateString());
+
+                            if (isDeleted) {
+                                android.widget.Toast.makeText(getContext(),
+                                        "Entry removed", android.widget.Toast.LENGTH_SHORT).show();
+
+                                // Refresh layout instantly with fresh DB values
+                                loadMealData();
+                            } else {
+                                android.widget.Toast.makeText(getContext(),
+                                        "Failed to delete entry", android.widget.Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+
+                return true;
+            });
 
             container.addView(tv);
         }

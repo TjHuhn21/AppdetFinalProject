@@ -7,6 +7,8 @@ public class FoodEntry {
     private int calories;
     private int protein;
 
+    private int id;
+
     public FoodEntry(String name, double servingSize, String unit, int calories, int protein) {
         this.name = name;
         this.servingSize = servingSize;
@@ -15,8 +17,12 @@ public class FoodEntry {
         this.protein = protein;
     }
 
+
+
+
     // --- GETTERS ---
     public String getName() { return name; }
+    public int getId() { return id; }
     public double getServingSize() { return servingSize; }
     public String getUnit() { return unit; }
     public int getCalories() { return calories; }
@@ -24,6 +30,7 @@ public class FoodEntry {
 
     // --- SETTERS ---
     public void setName(String name) { this.name = name; }
+    public void setId(int id) { this.id = id; }
     public void setServingSize(double servingSize) { this.servingSize = servingSize; }
     public void setUnit(String unit) { this.unit = unit; }
     public void setCalories(int calories) { this.calories = calories; }

@@ -562,12 +562,13 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return history;
     }
+    // 1. UPDATE THIS METHOD IN YOUR MyDatabaseHelper.java
     public ArrayList<FoodEntry> getFoodByMeal(String email, String date, String mealType) {
         ArrayList<FoodEntry> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Use specific column names in your SELECT to be safe
-        String query = "SELECT " + COL_FOOD_NAME + ", " + COL_SERVING_SIZE + ", " +
+        // Modified to include COL_FOOD_ID at index 0
+        String query = "SELECT " + COL_FOOD_ID + ", " + COL_FOOD_NAME + ", " + COL_SERVING_SIZE + ", " +
                 COL_SERVING_UNIT + ", " + COL_CALORIES + ", " + COL_PROTEIN +
                 " FROM " + TABLE_FOOD_LOG +
                 " WHERE " + COLUMN_EMAIL + " = ? AND " + COL_LOG_DATE + " = ? AND " + COL_MEAL_TYPE + " = ?";
@@ -576,19 +577,58 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor != null) {
             while (cursor.moveToNext()) {
-                // Indexing starts at 0 based on the SELECT order above
-                list.add(new FoodEntry(
-                        cursor.getString(0), // Name
-                        cursor.getDouble(1), // Serving Size
-                        cursor.getString(2), // Unit
-                        cursor.getInt(3),    // Calories
-                        cursor.getInt(4)     // Protein
-                ));
+                FoodEntry food = new FoodEntry(
+                        cursor.getString(1), // Name (shifted to index 1)
+                        cursor.getDouble(2), // Serving Size (index 2)
+                        cursor.getString(3), // Unit (index 3)
+                        cursor.getInt(4),    // Calories (index 4)
+                        cursor.getInt(5)     // Protein (index 5)
+                );
+
+                // Assign the database ID to the model object
+                food.setId(cursor.getInt(0));
+
+                list.add(food);
             }
             cursor.close();
         }
         db.close();
         return list;
+    }
+    public boolean deleteFoodEntry(int foodId, String email, String date) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        int caloriesToSubtract = 0;
+        int proteinToSubtract = 0;
+
+
+        Cursor cursor = db.rawQuery("SELECT " + COL_CALORIES + ", " + COL_PROTEIN +
+                        " FROM " + TABLE_FOOD_LOG + " WHERE " + COL_FOOD_ID + " = ?",
+                new String[]{String.valueOf(foodId)});
+
+        if (cursor.moveToFirst()) {
+            caloriesToSubtract = cursor.getInt(0);
+            proteinToSubtract = cursor.getInt(1);
+        }
+        cursor.close();
+
+        // Delete the row from the food log table
+        int deletedRows = db.delete(TABLE_FOOD_LOG, COL_FOOD_ID + " = ?", new String[]{String.valueOf(foodId)});
+
+        if (deletedRows > 0) {
+            // Automatically subtract values from daily dashboard logs (MAX keeps it from going below 0)
+            db.execSQL("UPDATE " + TABLE_DAILY_LOGS +
+                            " SET " + COL_CUR_CALORIES + " = MAX(0, " + COL_CUR_CALORIES + " - ?), " +
+                            COL_CUR_PROTEIN + " = MAX(0, " + COL_CUR_PROTEIN + " - ?) " +
+                            " WHERE " + COLUMN_EMAIL + " = ? AND " + COL_LOG_DATE + " = ?",
+                    new Object[]{caloriesToSubtract, proteinToSubtract, email, date});
+
+            db.close();
+            return true;
+        }
+
+        db.close();
+        return false;
     }
     public ArrayList<Integer> getDailyStats(String email, String date) {
         ArrayList<Integer> stats = new ArrayList<>();

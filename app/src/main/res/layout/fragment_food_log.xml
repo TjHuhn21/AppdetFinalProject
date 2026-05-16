@@ -14,7 +14,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- DATE NAV -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/dateNavLayout"
             android:layout_width="match_parent"
@@ -36,10 +35,10 @@
                     android:layout_height="40dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@android:drawable/ic_media_previous"
-                    app:tint="#2D9CDB"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:tint="#2D9CDB" />
 
                 <TextView
                     android:id="@+id/tvSelectedDate"
@@ -49,10 +48,10 @@
                     android:textColor="#1A365D"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    app:layout_constraintStart_toEndOf="@id/btnPrevDay"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/btnNextDay"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:layout_constraintStart_toEndOf="@id/btnPrevDay"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageButton
                     android:id="@+id/btnNextDay"
@@ -60,15 +59,165 @@
                     android:layout_height="40dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@android:drawable/ic_media_next"
-                    app:tint="#2D9CDB"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:tint="#2D9CDB" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- BREAKFAST -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="#beebfa"
+            app:cardCornerRadius="16dp"
+            app:strokeColor="#2D9CDB"
+            app:strokeWidth="1dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/tvCalorieHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Calories Remaining"
+                    android:textColor="#1A365D"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvGoalCal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="2,410"
+                    android:textColor="#1A365D"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@+id/tvMinus"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvCalorieHeader" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Goal"
+                    android:textColor="#7A8A99"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="@id/tvGoalCal"
+                    app:layout_constraintStart_toStartOf="@id/tvGoalCal"
+                    app:layout_constraintTop_toBottomOf="@id/tvGoalCal" />
+
+                <TextView
+                    android:id="@+id/tvMinus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="—"
+                    android:textColor="#1A365D"
+                    app:layout_constraintBottom_toBottomOf="@id/tvGoalCal"
+                    app:layout_constraintEnd_toStartOf="@+id/tvFoodCal"
+                    app:layout_constraintStart_toEndOf="@id/tvGoalCal"
+                    app:layout_constraintTop_toTopOf="@id/tvGoalCal" />
+
+                <TextView
+                    android:id="@+id/tvFoodCal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="#1A365D"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@+id/tvPlus"
+                    app:layout_constraintStart_toEndOf="@id/tvMinus"
+                    app:layout_constraintTop_toTopOf="@id/tvGoalCal" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Food"
+                    android:textColor="#7A8A99"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="@id/tvFoodCal"
+                    app:layout_constraintStart_toStartOf="@id/tvFoodCal"
+                    app:layout_constraintTop_toBottomOf="@id/tvFoodCal" />
+
+                <TextView
+                    android:id="@+id/tvPlus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+"
+                    android:textColor="#1A365D"
+                    app:layout_constraintBottom_toBottomOf="@id/tvGoalCal"
+                    app:layout_constraintEnd_toStartOf="@+id/tvExerciseCal"
+                    app:layout_constraintStart_toEndOf="@id/tvFoodCal"
+                    app:layout_constraintTop_toTopOf="@id/tvGoalCal" />
+
+                <TextView
+                    android:id="@+id/tvExerciseCal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="#1A365D"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@+id/tvEquals"
+                    app:layout_constraintStart_toEndOf="@id/tvPlus"
+                    app:layout_constraintTop_toTopOf="@id/tvGoalCal" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Exercise"
+                    android:textColor="#7A8A99"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="@id/tvExerciseCal"
+                    app:layout_constraintStart_toStartOf="@id/tvExerciseCal"
+                    app:layout_constraintTop_toBottomOf="@id/tvExerciseCal" />
+
+                <TextView
+                    android:id="@+id/tvEquals"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="="
+                    android:textColor="#1A365D"
+                    app:layout_constraintBottom_toBottomOf="@id/tvGoalCal"
+                    app:layout_constraintEnd_toStartOf="@+id/tvRemainingCal"
+                    app:layout_constraintStart_toEndOf="@id/tvExerciseCal"
+                    app:layout_constraintTop_toTopOf="@id/tvGoalCal" />
+
+                <TextView
+                    android:id="@+id/tvRemainingCal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2,410"
+                    android:textColor="#2D9CDB"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tvEquals"
+                    app:layout_constraintTop_toTopOf="@id/tvGoalCal" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Remaining"
+                    android:textColor="#7A8A99"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="@id/tvRemainingCal"
+                    app:layout_constraintStart_toStartOf="@id/tvRemainingCal"
+                    app:layout_constraintTop_toBottomOf="@id/tvRemainingCal" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -105,7 +254,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"/>
 
-                <!-- Food items list populated dynamically -->
                 <LinearLayout
                     android:id="@+id/llBreakfastItems"
                     android:layout_width="0dp"
@@ -119,7 +267,6 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- LUNCH -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -169,10 +316,10 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- DINNER -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
             app:cardBackgroundColor="#beebfa"
             app:cardCornerRadius="16dp"
             app:strokeColor="#2D9CDB"
@@ -214,6 +361,113 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tvDinnerTitle"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="#beebfa"
+            app:cardCornerRadius="16dp"
+            app:strokeColor="#2D9CDB"
+            app:strokeWidth="1dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tvExerciseTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Exercise"
+                    android:textColor="#1A365D"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddExercise"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ADD EXERCISE"
+                    android:textColor="#2D9CDB"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <LinearLayout
+                    android:id="@+id/llExerciseItems"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/btnAddExercise">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No exercise logged."
+                        android:textColor="#7A8A99"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:cardBackgroundColor="#beebfa"
+            app:cardCornerRadius="16dp"
+            app:strokeColor="#2D9CDB"
+            app:strokeWidth="1dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tvWaterTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Water"
+                    android:textColor="#1A365D"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddWater"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ADD WATER"
+                    android:textColor="#2D9CDB"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvWaterValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="0 ml"
+                    android:textColor="#1A365D"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvWaterTitle" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>

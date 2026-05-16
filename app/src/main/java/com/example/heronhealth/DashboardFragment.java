@@ -1,13 +1,11 @@
 package com.example.heronhealth;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
@@ -43,7 +41,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class DashboardFragment extends Fragment{
+public class DashboardFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -57,6 +55,7 @@ public class DashboardFragment extends Fragment{
     private ProgressBar progressCaloriesBar;
     private TextView tvRemainingValue, tvBaseGoal, tvFoodEaten, tvProteinLabel;
     private ImageView imgBackgroundWorkout;
+    private MaterialCardView caloriesCardView;
 
     // Steps
     private ProgressBar pbStepsProgress;
@@ -77,7 +76,6 @@ public class DashboardFragment extends Fragment{
     private MaterialButton btnAddWeight;
 
     private MyDatabaseHelper myDb;
-
     private String currentUserEmail;
 
     private int waterGoalMl;
@@ -86,15 +84,29 @@ public class DashboardFragment extends Fragment{
 
     private String todayDate;
 
-    private MaterialCardView caloriesCardView;
+    private static final String PREF_STEPS_OFFSET  = "steps_at_start_of_day";
+    private static final String PREF_LAST_LOG_DATE = "last_log_date";
+    private static final String PREF_WEIGHT_SEEDED = "weight_chart_seeded";
 
-    private static final String PREF_STEPS_OFFSET    = "steps_at_start_of_day";
-    private static final String PREF_LAST_LOG_DATE   = "last_log_date";
-    private static final String PREF_WEIGHT_SEEDED   = "weight_chart_seeded";
+    private final BroadcastReceiver stepReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
 
-    public DashboardFragment() {
-        // Required empty public constructor
-    }
+            // Safety check: fragment must still be attached to a view
+            if (!isAdded() || getView() == null) return;
+
+            int stepsToday = intent.getIntExtra(
+                    StepCounterService.EXTRA_STEPS_TODAY, 0
+            );
+
+            tvStepCountValue.setText(String.valueOf(stepsToday));
+            pbStepsProgress.setProgress(
+                    Math.min(stepsToday, pbStepsProgress.getMax())
+            );
+        }
+    };
+
+    public DashboardFragment() { }
 
     public static DashboardFragment newInstance(String param1, String param2) {
         DashboardFragment fragment = new DashboardFragment();
@@ -108,7 +120,6 @@ public class DashboardFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -120,13 +131,17 @@ public class DashboardFragment extends Fragment{
                              Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_dashboard, container, false);
-        //ask permision four physcial actibede
+
+        // Request ACTIVITY_RECOGNITION permission (Android 10+)
         if (ContextCompat.checkSelfPermission(requireContext(),
-                android.Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
+                android.Manifest.permission.ACTIVITY_RECOGNITION)
+                != PackageManager.PERMISSION_GRANTED) {
+
             ActivityCompat.requestPermissions(requireActivity(),
                     new String[]{android.Manifest.permission.ACTIVITY_RECOGNITION}, 1);
         }
 
+        // Start the background step service
         Intent serviceIntent = new Intent(getContext(), StepCounterService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             requireContext().startForegroundService(serviceIntent);
@@ -134,47 +149,38 @@ public class DashboardFragment extends Fragment{
             requireContext().startService(serviceIntent);
         }
 
-        //get date today
-        todayDate = new SimpleDateFormat(
-                "yyyy-MM-dd",
-                Locale.getDefault()
-        ).format(new Date());
+        todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                .format(new Date());
 
-        //get the last log date for sharedpref
         SharedPreferences sharedPref = requireActivity()
                 .getSharedPreferences("HeronHealthPrefs", Context.MODE_PRIVATE);
 
         String lastSavedDate = sharedPref.getString(PREF_LAST_LOG_DATE, "");
 
-        // Reset daily step offset when day changes
         if (!lastSavedDate.equals(todayDate)) {
             sharedPref.edit()
                     .putString(PREF_LAST_LOG_DATE, todayDate)
-                    .putInt(PREF_STEPS_OFFSET, -1)   // -1 = "not yet captured today"
+                    .putInt(PREF_STEPS_OFFSET, -1)
                     .apply();
         }
 
         initialize();
 
-        //get the current user email
         currentUserEmail = sharedPref.getString("userEmail", "");
 
-        //check if log exists
         myDb.checkAndInitDailyLog(currentUserEmail, todayDate);
 
-        // Seed the weight chart with the registration weight on first install
         seedInitialWeightIfNeeded(sharedPref);
 
         checkAndLoadData();
 
-        //Calories
-
-        caloriesCardView.setOnClickListener(view1 -> {
+        // Calories card
+        caloriesCardView.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), NutritionActivity.class);
             startActivity(intent);
         });
 
-        // --- Water ---
+        // Water
         btnUpdateWater.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), WaterAddActivity.class);
             intent.putExtra("CURRENT_WATER", currentWaterValue);
@@ -182,99 +188,118 @@ public class DashboardFragment extends Fragment{
             startActivity(intent);
         });
 
-        // --- Workout ---
-        btnLogWorkout.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), AddExerciseActivity.class);
-            startActivity(intent);
-        });
+        // Workout
+        btnLogWorkout.setOnClickListener(v ->
+                startActivity(new Intent(getContext(), AddExerciseActivity.class)));
 
-        // --- Weight ---
-        btnAddWeight.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), UpdateWeightActivity.class);
-            startActivity(intent);
-        });
+        // Weight
+        btnAddWeight.setOnClickListener(v ->
+                startActivity(new Intent(getContext(), UpdateWeightActivity.class)));
 
-        // --- Step Goal Edit ---
+        // Step goal edit
         btnEditStepGoal.setOnClickListener(v -> showEditStepGoalDialog());
 
         return view;
     }
+
+    // ─── Register receiver when fragment is visible ──────────────────────────
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onResume() {
+        super.onResume();
+
+        // Register the step receiver so broadcasts from the service reach this fragment
+        IntentFilter filter = new IntentFilter(StepCounterService.ACTION_STEPS_UPDATED);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requireContext().registerReceiver(
+                    stepReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            requireContext().registerReceiver(stepReceiver, filter);
+        }
+
+        // Also refresh all stats from DB in case we came back from another screen
+        refreshDashboardStats();
+    }
+
+    // ─── Unregister receiver when fragment goes off-screen ───────────────────
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        try {
+            requireContext().unregisterReceiver(stepReceiver);
+        } catch (IllegalArgumentException ignored) {
+            // Wasn't registered — safe to ignore
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions,
+                                           int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted! Start the sensor immediately
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission just granted — restart service so it can register the sensor
+                Intent serviceIntent = new Intent(getContext(), StepCounterService.class);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    requireContext().startForegroundService(serviceIntent);
+                } else {
+                    requireContext().startService(serviceIntent);
+                }
             } else {
-                Toast.makeText(getContext(), "Permission denied. Steps cannot be tracked.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(),
+                        "Permission denied. Steps cannot be tracked.",
+                        Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-
-     //On first install, the weight_progress table is empty.
-     //We seed it with the weight the user entered at registration
-     //so the chart always has a starting point.
-
     private void seedInitialWeightIfNeeded(SharedPreferences sharedPref) {
 
         boolean alreadySeeded = sharedPref.getBoolean(PREF_WEIGHT_SEEDED, false);
-
         if (alreadySeeded) return;
 
-        // Only seed if weight_progress is truly empty for this user
         ArrayList<WeightEntry> history = myDb.getWeightHistoryList(currentUserEmail);
 
         if (history.isEmpty()) {
-
             ArrayList<PersonalInfo> users = myDb.getUserList(currentUserEmail);
-
             if (!users.isEmpty()) {
-
                 String rawWeight = users.get(0).getWeight();
-
                 try {
                     double registrationWeight = Double.parseDouble(rawWeight);
-
-                    // Use today as the seed date (registration day approximation)
                     myDb.addWeightEntry(currentUserEmail, registrationWeight, todayDate);
-
                 } catch (NumberFormatException ignored) { }
             }
         }
 
-        // Mark as seeded so we never do this again
         sharedPref.edit().putBoolean(PREF_WEIGHT_SEEDED, true).apply();
     }
 
     private void initialize() {
 
-        // Calories
-        caloriesCardView = view.findViewById(R.id.cardCalories);
+        caloriesCardView    = view.findViewById(R.id.cardCalories);
         progressCaloriesBar = view.findViewById(R.id.progressCaloriesBar);
         tvRemainingValue    = view.findViewById(R.id.tvRemainingValue);
         tvBaseGoal          = view.findViewById(R.id.tvBaseGoal);
         tvFoodEaten         = view.findViewById(R.id.tvFoodEaten);
         tvProteinLabel      = view.findViewById(R.id.tvProteinLabel);
 
-        // Steps
         pbStepsProgress  = view.findViewById(R.id.pbStepsProgress);
         tvStepCountValue = view.findViewById(R.id.tvStepCountValue);
         btnEditStepGoal  = view.findViewById(R.id.btnEditStepGoal);
         tvStepGoalLabel  = view.findViewById(R.id.tvStepGoalLabel);
 
-        // Water
         tvTargetWater  = view.findViewById(R.id.tvWaterTarget);
         tvWaterCount   = view.findViewById(R.id.tvWaterCount);
         pbWaterIntake  = view.findViewById(R.id.pbWaterProgress);
         btnUpdateWater = view.findViewById(R.id.btnUpdateWater);
 
-        // Workout
         tvRecentWorkoutStatus = view.findViewById(R.id.tvRecentWorkoutStatus);
-        imgBackgroundWorkout = view.findViewById(R.id.bgWorkout);
-        btnLogWorkout = view.findViewById(R.id.btnLogWorkout);
+        imgBackgroundWorkout  = view.findViewById(R.id.bgWorkout);
+        btnLogWorkout         = view.findViewById(R.id.btnLogWorkout);
 
-        // Weight
         weightLineChart = view.findViewById(R.id.weightLineChart);
         btnAddWeight    = view.findViewById(R.id.btnAddWeight);
 
@@ -298,25 +323,21 @@ public class DashboardFragment extends Fragment{
             tvWaterCount.setText(water + " ml");
             pbWaterIntake.setProgress(Math.min(water, pbWaterIntake.getMax()));
 
-            // Steps — only update from DB if sensor hasn't fired yet this session
-            // The sensor callback keeps the live count; DB is the floor on resume
-            String displayed = tvStepCountValue.getText().toString();
-            if (displayed.equals("0") || displayed.equals("N/A")) {
-                tvStepCountValue.setText(String.valueOf(steps));
-                pbStepsProgress.setProgress(Math.min(steps, pbStepsProgress.getMax()));
-            }
+            // Steps — load last saved value from DB on resume;
+            // after that the BroadcastReceiver keeps it live
+            tvStepCountValue.setText(String.valueOf(steps));
+            pbStepsProgress.setProgress(Math.min(steps, pbStepsProgress.getMax()));
 
             // Calories remaining
             int calorieGoal = progressCaloriesBar.getMax() > 0
-                    ? progressCaloriesBar.getMax()
-                    : 2000;
+                    ? progressCaloriesBar.getMax() : 2000;
 
             int remaining = Math.max(0, calorieGoal - calories);
             tvRemainingValue.setText(String.valueOf(remaining));
-            progressCaloriesBar.setProgress(Math.min(calories, progressCaloriesBar.getMax()));
+            progressCaloriesBar.setProgress(
+                    Math.min(calories, progressCaloriesBar.getMax()));
             tvFoodEaten.setText("Food: " + calories + " kcal");
 
-            // Protein
             tvProteinLabel.setText("Protein: " + protein + "g");
         }
 
@@ -338,7 +359,6 @@ public class DashboardFragment extends Fragment{
             }
             tvRecentWorkoutStatus.setText(sb.toString().trim());
             imgBackgroundWorkout.setImageResource(R.drawable.heronawake);
-
         }
     }
 
@@ -349,14 +369,14 @@ public class DashboardFragment extends Fragment{
         if (history.isEmpty()) {
             weightLineChart.setNoDataText("No weight data yet. Tap Add to log your weight.");
             weightLineChart.setNoDataTextColor(
-                    requireContext().getResources().getColor(android.R.color.darker_gray, null)
-            );
+                    requireContext().getResources().getColor(
+                            android.R.color.darker_gray, null));
             weightLineChart.invalidate();
             return;
         }
 
         ArrayList<Entry> entries = new ArrayList<>();
-        ArrayList<String> labels  = new ArrayList<>();
+        ArrayList<String> labels = new ArrayList<>();
 
         for (int i = 0; i < history.size(); i++) {
             WeightEntry we = history.get(i);
@@ -426,25 +446,26 @@ public class DashboardFragment extends Fragment{
 
                         if (!users.isEmpty()) {
                             PersonalInfo user = users.get(0);
-                            myDb.updateGoals(
-                                    currentUserEmail,
-                                    user.getCalorieGoal(),
-                                    stepGoal,
-                                    user.getWaterGoal(),
-                                    user.getProteinGoal()
-                            );
+                            myDb.updateGoals(currentUserEmail,
+                                    user.getCalorieGoal(), stepGoal,
+                                    user.getWaterGoal(), user.getProteinGoal());
                         }
 
                         pbStepsProgress.setMax(stepGoal);
                         tvStepGoalLabel.setText("/ " + stepGoal + " steps");
 
-                        Toast.makeText(getContext(), "Step goal updated!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(),
+                                "Step goal updated!", Toast.LENGTH_SHORT).show();
 
                     } else {
-                        Toast.makeText(getContext(), "Please enter a positive step goal.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(),
+                                "Please enter a positive step goal.",
+                                Toast.LENGTH_SHORT).show();
                     }
+
                 } catch (NumberFormatException e) {
-                    Toast.makeText(getContext(), "Invalid number.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(),
+                            "Invalid number.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -452,20 +473,6 @@ public class DashboardFragment extends Fragment{
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
         builder.show();
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-
-        refreshDashboardStats();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
 
     private void calculateInitialGoals(PersonalInfo user) {
 
@@ -476,18 +483,14 @@ public class DashboardFragment extends Fragment{
         String activity = user.getActivityLevel();
         String goal     = user.getGoal();
 
-        // BMR (Mifflin-St Jeor)
         double bmr;
-
         if (gender.equalsIgnoreCase("Male")) {
             bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
         } else {
             bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
         }
 
-        // TDEE
         double tdee;
-
         switch (activity) {
             case "Lightly Active": tdee = bmr * 1.375; break;
             case "Active":         tdee = bmr * 1.55;  break;
@@ -495,9 +498,7 @@ public class DashboardFragment extends Fragment{
             default:               tdee = bmr * 1.2;   break;
         }
 
-        // Goal adjustment
         int finalCalorieGoal;
-
         if (goal.equalsIgnoreCase("Lose Weight")) {
             finalCalorieGoal = (int) (tdee - 500);
         } else if (goal.equalsIgnoreCase("Gain Muscle")) {
@@ -506,7 +507,6 @@ public class DashboardFragment extends Fragment{
             finalCalorieGoal = (int) tdee;
         }
 
-        // Water goal
         double weightLbs = weight * 2.20462;
         double waterOz   = weightLbs / 2.0;
         waterGoalMl      = (int) (waterOz * 29.57);
@@ -514,39 +514,26 @@ public class DashboardFragment extends Fragment{
         int proteinGoal = (int) (weight * 2.0);
         stepGoal = 7000;
 
-        myDb.updateGoals(
-                currentUserEmail,
-                finalCalorieGoal,
-                stepGoal,
-                waterGoalMl,
-                proteinGoal
-        );
+        myDb.updateGoals(currentUserEmail, finalCalorieGoal,
+                stepGoal, waterGoalMl, proteinGoal);
 
         displayGoals(finalCalorieGoal, proteinGoal, waterGoalMl, stepGoal);
     }
 
     private int calculateAge(String dobString) {
-
         try {
             String[] parts = dobString.split("/");
-
             int day   = Integer.parseInt(parts[0]);
             int month = Integer.parseInt(parts[1]) - 1;
             int year  = Integer.parseInt(parts[2]);
 
             Calendar dob   = Calendar.getInstance();
             dob.set(year, month, day);
-
             Calendar today = Calendar.getInstance();
 
             int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
-
-            if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) {
-                age--;
-            }
-
+            if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) age--;
             return age;
-
         } catch (Exception e) {
             return 25;
         }
@@ -557,18 +544,12 @@ public class DashboardFragment extends Fragment{
         ArrayList<PersonalInfo> users = myDb.getUserList(currentUserEmail);
 
         if (!users.isEmpty()) {
-
             PersonalInfo user = users.get(0);
-
             if (user.getCalorieGoal() == 0) {
                 calculateInitialGoals(user);
             } else {
-                displayGoals(
-                        user.getCalorieGoal(),
-                        user.getProteinGoal(),
-                        user.getWaterGoal(),
-                        user.getStepGoal()
-                );
+                displayGoals(user.getCalorieGoal(), user.getProteinGoal(),
+                        user.getWaterGoal(), user.getStepGoal());
             }
         }
     }
@@ -578,17 +559,14 @@ public class DashboardFragment extends Fragment{
         waterGoalMl = water;
         stepGoal    = steps;
 
-        // Calories
         tvBaseGoal.setText("Base Goal: " + calories);
         tvRemainingValue.setText(String.valueOf(calories));
         progressCaloriesBar.setMax(calories);
         tvProteinLabel.setText("Protein: 0g / " + protein + "g");
 
-        // Steps
         tvStepGoalLabel.setText("/ " + steps + " steps");
         pbStepsProgress.setMax(steps);
 
-        // Water
         tvTargetWater.setText("Target: " + water + " ml");
         pbWaterIntake.setMax(water);
     }
