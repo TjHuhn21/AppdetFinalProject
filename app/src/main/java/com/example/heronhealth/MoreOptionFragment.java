@@ -9,13 +9,16 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.Toast;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,6 +32,12 @@ public class MoreOptionFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    Switch switcher;
+    boolean nightMode;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
+
+
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -39,6 +48,7 @@ public class MoreOptionFragment extends Fragment {
 
     AlertDialog.Builder builder;
     MyDatabaseHelper myDb;
+
     public MoreOptionFragment() {
         // Required empty public constructor
     }
@@ -64,6 +74,8 @@ public class MoreOptionFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -75,6 +87,28 @@ public class MoreOptionFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_more_option, container, false);
+
+        switcher = view.findViewById(R.id.switchTheme);
+
+        sharedPreferences = requireActivity().getSharedPreferences("theme_prefs", 0);
+        editor = sharedPreferences.edit();
+
+        nightMode = sharedPreferences.getBoolean("nightMode",false);
+
+        if (nightMode){
+            switcher.setChecked(true);
+        }
+
+        switcher.setOnCheckedChangeListener((buttonView, isChecked) ->{
+            if (isChecked){
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                editor.putBoolean("nightMode", true);
+            }else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                editor.putBoolean("nightMode", false);
+            }
+            editor.apply();
+        });
 
         personalInfo = view.findViewById(R.id.itemPersonalInfo);
         deleteAcc = view.findViewById(R.id.itemDeleteAccount);
