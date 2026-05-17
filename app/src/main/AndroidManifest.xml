@@ -9,6 +9,8 @@
         android:name="android.hardware.sensor.stepdetector"
         android:required="true" />
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
@@ -23,6 +25,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HeronHealth"
         tools:targetApi="31">
+        <activity
+            android:name=".HabitPickerActivity"
+            android:exported="false" />
         <activity
             android:name=".NutritionActivity"
             android:exported="false" />

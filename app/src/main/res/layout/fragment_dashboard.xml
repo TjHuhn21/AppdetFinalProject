@@ -152,7 +152,7 @@
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent">
 
                 <ImageView
                     android:layout_width="match_parent"
@@ -172,6 +172,7 @@
                     android:orientation="vertical"
                     android:padding="18dp">
 
+                    <!-- HEADER ROW -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -179,60 +180,71 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:text="Weekly Habits"
                             android:textColor="#FFFFFF"
                             android:textSize="20sp"
                             android:textStyle="bold"/>
+
+                        <!-- "Start a habit" / "Change habit" button -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnStartHabit"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Start a habit"
+                            android:textColor="#9ed2e8"
+                            android:textSize="13sp" />
                     </LinearLayout>
 
+                    <!-- Active habit name shown here after selection -->
                     <TextView
+                        android:id="@+id/tvHabitSubtitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="Log a meal for 5+ days this week."
+                        android:layout_marginTop="2dp"
+                        android:text="Choose a habit to track this week."
                         android:textColor="#E0E0E0"
-                        android:textSize="14sp"/>
+                        android:textSize="13sp"/>
 
+                    <!-- DAY CIRCLES -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="22dp"
+                        android:layout_marginTop="14dp"
                         android:gravity="center"
                         android:orientation="horizontal"
                         android:weightSum="7">
 
+                        <!-- MON -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
                             android:orientation="vertical">
-
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="MON"
                                 android:textColor="#FFFFFF"
-                                android:textSize="12sp"/>
-
+                                android:textSize="11sp"/>
                             <FrameLayout
-                                android:layout_width="42dp"
-                                android:layout_height="42dp"
-                                android:layout_marginTop="8dp"
-                                android:background="@drawable/circle_done">
-
+                                android:id="@+id/frameMonDay"
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:layout_marginTop="6dp"
+                                android:background="@drawable/box_uncheck">
                                 <TextView
                                     android:id="@+id/tvMon"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
-                                    android:text="12"
+                                    android:text="1"
                                     android:textColor="#FFFFFF"
-                                    android:textSize="15sp"/>
-
-                                <!-- CHECK ICON -->
+                                    android:textSize="14sp"/>
                                 <ImageView
                                     android:id="@+id/imgMon"
                                     android:layout_width="18dp"
@@ -244,36 +256,33 @@
                             </FrameLayout>
                         </LinearLayout>
 
+                        <!-- TUE -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
                             android:orientation="vertical">
-
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="TUE"
                                 android:textColor="#FFFFFF"
-                                android:textSize="12sp"/>
-
+                                android:textSize="11sp"/>
                             <FrameLayout
-                                android:layout_width="42dp"
-                                android:layout_height="42dp"
-                                android:layout_marginTop="8dp"
+                                android:id="@+id/frameTueDay"
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:layout_marginTop="6dp"
                                 android:background="@drawable/box_uncheck">
-
                                 <TextView
                                     android:id="@+id/tvTue"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
-                                    android:text="12"
+                                    android:text="2"
                                     android:textColor="#FFFFFF"
-                                    android:textSize="15sp"/>
-
-                                <!-- CHECK ICON -->
+                                    android:textSize="14sp"/>
                                 <ImageView
                                     android:id="@+id/imgTue"
                                     android:layout_width="18dp"
@@ -285,36 +294,33 @@
                             </FrameLayout>
                         </LinearLayout>
 
+                        <!-- WED -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
                             android:orientation="vertical">
-
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="WED"
                                 android:textColor="#FFFFFF"
-                                android:textSize="12sp"/>
-
+                                android:textSize="11sp"/>
                             <FrameLayout
-                                android:layout_width="42dp"
-                                android:layout_height="42dp"
-                                android:layout_marginTop="8dp"
+                                android:id="@+id/frameWedDay"
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:layout_marginTop="6dp"
                                 android:background="@drawable/box_uncheck">
-
                                 <TextView
                                     android:id="@+id/tvWed"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
-                                    android:text="12"
+                                    android:text="3"
                                     android:textColor="#FFFFFF"
-                                    android:textSize="15sp"/>
-
-                                <!-- CHECK ICON -->
+                                    android:textSize="14sp"/>
                                 <ImageView
                                     android:id="@+id/imgWed"
                                     android:layout_width="18dp"
@@ -326,36 +332,33 @@
                             </FrameLayout>
                         </LinearLayout>
 
+                        <!-- THU -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
                             android:orientation="vertical">
-
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="THU"
                                 android:textColor="#FFFFFF"
-                                android:textSize="12sp"/>
-
+                                android:textSize="11sp"/>
                             <FrameLayout
-                                android:layout_width="42dp"
-                                android:layout_height="42dp"
-                                android:layout_marginTop="8dp"
+                                android:id="@+id/frameThuDay"
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:layout_marginTop="6dp"
                                 android:background="@drawable/box_uncheck">
-
                                 <TextView
                                     android:id="@+id/tvThu"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
-                                    android:text="12"
+                                    android:text="4"
                                     android:textColor="#FFFFFF"
-                                    android:textSize="15sp"/>
-
-                                <!-- CHECK ICON -->
+                                    android:textSize="14sp"/>
                                 <ImageView
                                     android:id="@+id/imgThu"
                                     android:layout_width="18dp"
@@ -367,36 +370,33 @@
                             </FrameLayout>
                         </LinearLayout>
 
+                        <!-- FRI -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
                             android:orientation="vertical">
-
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="FRI"
                                 android:textColor="#FFFFFF"
-                                android:textSize="12sp"/>
-
+                                android:textSize="11sp"/>
                             <FrameLayout
-                                android:layout_width="42dp"
-                                android:layout_height="42dp"
-                                android:layout_marginTop="8dp"
+                                android:id="@+id/frameFriDay"
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:layout_marginTop="6dp"
                                 android:background="@drawable/box_uncheck">
-
                                 <TextView
                                     android:id="@+id/tvFri"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
-                                    android:text="12"
+                                    android:text="5"
                                     android:textColor="#FFFFFF"
-                                    android:textSize="15sp"/>
-
-                                <!-- CHECK ICON -->
+                                    android:textSize="14sp"/>
                                 <ImageView
                                     android:id="@+id/imgFri"
                                     android:layout_width="18dp"
@@ -408,36 +408,33 @@
                             </FrameLayout>
                         </LinearLayout>
 
+                        <!-- SAT -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
                             android:orientation="vertical">
-
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="SAT"
                                 android:textColor="#FFFFFF"
-                                android:textSize="12sp"/>
-
+                                android:textSize="11sp"/>
                             <FrameLayout
-                                android:layout_width="42dp"
-                                android:layout_height="42dp"
-                                android:layout_marginTop="8dp"
+                                android:id="@+id/frameSatDay"
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:layout_marginTop="6dp"
                                 android:background="@drawable/box_uncheck">
-
                                 <TextView
                                     android:id="@+id/tvSat"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
-                                    android:text="12"
+                                    android:text="6"
                                     android:textColor="#FFFFFF"
-                                    android:textSize="15sp"/>
-
-                                <!-- CHECK ICON -->
+                                    android:textSize="14sp"/>
                                 <ImageView
                                     android:id="@+id/imgSat"
                                     android:layout_width="18dp"
@@ -449,36 +446,33 @@
                             </FrameLayout>
                         </LinearLayout>
 
+                        <!-- SUN -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
                             android:orientation="vertical">
-
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="SUN"
                                 android:textColor="#FFFFFF"
-                                android:textSize="12sp"/>
-
+                                android:textSize="11sp"/>
                             <FrameLayout
-                                android:layout_width="42dp"
-                                android:layout_height="42dp"
-                                android:layout_marginTop="8dp"
+                                android:id="@+id/frameSunDay"
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:layout_marginTop="6dp"
                                 android:background="@drawable/box_uncheck">
-
                                 <TextView
                                     android:id="@+id/tvSun"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
-                                    android:text="12"
+                                    android:text="7"
                                     android:textColor="#FFFFFF"
-                                    android:textSize="15sp"/>
-
-                                <!-- CHECK ICON -->
+                                    android:textSize="14sp"/>
                                 <ImageView
                                     android:id="@+id/imgSun"
                                     android:layout_width="18dp"
@@ -491,24 +485,100 @@
                         </LinearLayout>
 
                     </LinearLayout>
-
                 </LinearLayout>
+            </FrameLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- STEP COUNTER AND WEIGHT -->
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardSteps"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:cardUseCompatPadding="true">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/fly"
+                    android:scaleType="centerCrop"
+                    android:alpha="0.65"/>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layoutStepsInternal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvStepsTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Steps"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#1A365D"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnEditStepGoal"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Edit Goal"
+                        android:textColor="#2D9CDB"
+                        app:icon="@android:drawable/ic_menu_edit"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tvStepCountValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#1A365D"
+                        android:layout_marginTop="8dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvStepsTitle" />
+
+                    <TextView
+                        android:id="@+id/tvStepGoalLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="/ 10,000 steps"
+                        android:textSize="14sp"
+                        android:textColor="#2C3E50"
+                        app:layout_constraintStart_toEndOf="@id/tvStepCountValue"
+                        app:layout_constraintBottom_toBottomOf="@id/tvStepCountValue" />
+
+                    <ProgressBar
+                        android:id="@+id/pbStepsProgress"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="0dp"
+                        android:layout_height="8dp"
+                        android:layout_marginTop="12dp"
+                        android:progress="0"
+                        android:progressTint="#2D9CDB"
+                        android:backgroundTint="#9ed2e8"
+                        app:layout_constraintTop_toBottomOf="@id/tvStepCountValue"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </FrameLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- STEP COUNTER AND WEIGHT -->
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerCarousel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:clipToPadding="false"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:overScrollMode="never"/>
 
         <!--  HYDRATION TRACKER -->
         <com.google.android.material.card.MaterialCardView
@@ -689,7 +759,7 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- WEIGHT PROGRESS CARD
+        <!-- WEIGHT PROGRESS CARD -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardWeight"
             android:layout_width="match_parent"
@@ -741,7 +811,50 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"/>
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView-->
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardStepsProgress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:id="@+id/layoutStepsProgressInternal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:id="@+id/layoutStepsHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:id="@+id/tvStepsProgressTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Steps Progress"
+                        android:textSize="16sp"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/StepsLineChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <ImageView
             android:layout_height="100dp"
