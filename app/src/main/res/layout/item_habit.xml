@@ -7,7 +7,7 @@
     android:gravity="center_vertical"
     android:padding="16dp"
     android:layout_marginBottom="10dp"
-    android:background="@drawable/box_uncheck"
+    android:background="#1F7DC8"
     android:minHeight="56dp">
 
     <TextView
