@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="More Options"
-        style="@style/TEXT"
+        android:textColor="#1F1D32"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
@@ -29,7 +29,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="90dp"
-        app:cardBackgroundColor="#beebfa"
+        app:cardBackgroundColor="@color/card_bg"
         app:cardCornerRadius="16dp"
         app:strokeColor="#7dbed4"
         app:strokeWidth="1dp"
@@ -98,6 +98,11 @@
                     android:textSize="16sp"/>
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#7dbed4"/>
+
             <LinearLayout
                 android:id="@+id/itemTheme"
                 android:layout_width="match_parent"
@@ -116,7 +121,8 @@
                 <Switch
                     android:id="@+id/switchTheme"
                     android:layout_width="45dp"
-                    android:layout_height="20dp"/>
+                    android:layout_height="20dp"
+                    android:shadowColor="#1D3360"/>
 
                     <TextView
                     android:layout_width="wrap_content"

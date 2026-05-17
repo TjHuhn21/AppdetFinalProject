@@ -76,7 +76,7 @@
                         android:text="2,410"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"
+                        android:textColor="#FFFFFF"
                         app:layout_constraintStart_toStartOf="@id/progressCaloriesBar"
                         app:layout_constraintEnd_toEndOf="@id/progressCaloriesBar"
                         app:layout_constraintTop_toTopOf="@id/progressCaloriesBar"
@@ -87,8 +87,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Remaining"
-                        android:textSize="12sp"
-                        android:textColor="#000000"
+                        android:textSize="15sp"
+                        android:textColor="#FFFFFF"
                         app:layout_constraintStart_toStartOf="@id/progressCaloriesBar"
                         app:layout_constraintEnd_toEndOf="@id/progressCaloriesBar"
                         app:layout_constraintTop_toBottomOf="@id/tvRemainingValue"
@@ -110,7 +110,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Base Goal: 2,410"
-                            android:textColor="#000000"
+                            android:textColor="#FFFFFF"
                             android:textSize="14sp" />
 
                         <TextView
@@ -118,7 +118,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Food: 0"
-                            android:textColor="#000000"
+                            android:textColor="#FFFFFF"
                             android:layout_marginTop="8dp"
                             android:textSize="14sp" />
 
@@ -127,7 +127,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Protein: 0g / 150g"
-                            android:textColor="#000000"
+                            android:textColor="#FFFFFF"
                             android:layout_marginTop="12dp"
                             android:textSize="12sp" />
 
@@ -572,6 +572,7 @@
                         app:layout_constraintStart_toEndOf="@id/tvStepCountValue"
                         app:layout_constraintBottom_toBottomOf="@id/tvStepCountValue" />
 
+
                     <ProgressBar
                         android:id="@+id/pbStepsProgress"
                         style="?android:attr/progressBarStyleHorizontal"
@@ -800,9 +801,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Weight Progress"
+                        style="@style/TEXT"
                         android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#000000"/>
+                        android:textStyle="bold"/>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnAddWeight"
@@ -812,13 +813,15 @@
                         android:text="Add"
                         android:minWidth="0dp"
                         android:padding="8dp"
-                        app:icon="@android:drawable/ic_input_add" />
+                        app:icon="@android:drawable/ic_input_add"
+                        android:textColor="#136F98"
+                        app:iconTint="#136F98"/>
                 </LinearLayout>
 
                 <com.github.mikephil.charting.charts.LineChart
                     android:id="@+id/weightLineChart"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp" />
+                    android:layout_height="200dp"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
