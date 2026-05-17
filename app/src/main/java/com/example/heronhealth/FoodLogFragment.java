@@ -35,10 +35,10 @@ public class FoodLogFragment extends Fragment {
 
     // Date nav
     private ImageButton btnPrevDay, btnNextDay;
-    private TextView tvSelectedDate;
+    private TextView tvSelectedDate, tvWaterValue, tvExercises;
 
     // Meal add buttons
-    private MaterialButton btnAddBreakfast, btnAddLunch, btnAddDinner;
+    private MaterialButton btnAddBreakfast, btnAddLunch, btnAddDinner, btnAddWorkOut, btnAddWater;
 
     // Meal food list containers (dynamically populated)
     private LinearLayout llBreakfastItems, llLunchItems, llDinnerItems;
@@ -109,6 +109,15 @@ public class FoodLogFragment extends Fragment {
         btnAddLunch.setOnClickListener(v    -> openFoodSearch("Lunch"));
         btnAddDinner.setOnClickListener(v   -> openFoodSearch("Dinner"));
 
+        btnAddWorkOut.setOnClickListener(view1 -> {
+            Intent intent = new Intent(getActivity(), AddExerciseActivity.class);
+            startActivity(intent);
+        });
+        btnAddWater.setOnClickListener(view1 -> {
+            Intent intent = new Intent(getActivity(), WaterAddActivity.class);
+            startActivity(intent);
+        });
+
         return view;
     }
 
@@ -124,10 +133,14 @@ public class FoodLogFragment extends Fragment {
         btnPrevDay      = view.findViewById(R.id.btnPrevDay);
         btnNextDay      = view.findViewById(R.id.btnNextDay);
         tvSelectedDate  = view.findViewById(R.id.tvSelectedDate);
+        tvWaterValue = view.findViewById(R.id.tvWaterValue);
+        tvExercises = view.findViewById(R.id.tvExercises);
 
         btnAddBreakfast = view.findViewById(R.id.btnAddBreakfast);
         btnAddLunch     = view.findViewById(R.id.btnAddLunch);
         btnAddDinner    = view.findViewById(R.id.btnAddDinner);
+        btnAddWorkOut = view.findViewById(R.id.btnAddExercise);
+        btnAddWater = view.findViewById(R.id.btnAddWater);
 
         llBreakfastItems = view.findViewById(R.id.llBreakfastItems);
         llLunchItems     = view.findViewById(R.id.llLunchItems);
@@ -186,6 +199,27 @@ public class FoodLogFragment extends Fragment {
                 myDb.getFoodByMeal(currentUserEmail, date, "Dinner"),
                 llDinnerItems
         );
+
+        ArrayList<Integer> dailyData =
+                myDb.getDailyStats(currentUserEmail, date);
+
+        int water    = dailyData.get(0);
+
+        tvWaterValue.setText(water + "ml");
+
+        ArrayList<String> todayWorkouts =
+                myDb.getWorkoutsForDate(currentUserEmail, date);
+
+        if (todayWorkouts.isEmpty()) {
+            tvExercises.setText("No workouts logged today.");
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (String w : todayWorkouts) {
+                sb.append("• ").append(w).append("\n");
+            }
+            tvExercises.setText(sb.toString().trim());
+        }
+
     }
 
     /**
@@ -220,7 +254,6 @@ public class FoodLogFragment extends Fragment {
             tv.setTextSize(13f);
             tv.setPadding(0, 6, 0, 6);
 
-            // Make it visually interactable (optional but nice)
             tv.setClickable(true);
             tv.setFocusable(true);
 

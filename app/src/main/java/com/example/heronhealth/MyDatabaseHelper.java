@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 
 import com.example.heronhealth.model.FoodEntry;
 import com.example.heronhealth.model.PersonalInfo;
+import com.example.heronhealth.model.StepEntry;
 import com.example.heronhealth.model.WeightEntry;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 class MyDatabaseHelper extends SQLiteOpenHelper {
     private Context context;
     private static final String DATABASE_NAME = "HeronHealth.db";
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
 
     private static final String TABLE_NAME = "heron_User";
     private static final String COLUMN_ID = "user_ID";
@@ -82,6 +83,11 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_WORKOUT_WEIGHT = "weight_kg";
     public static final String COL_WORKOUT_CALS   = "calories_burned";
     public static final String COL_WORKOUT_DATE   = "workout_date";
+
+    // New table constants
+    public static final String TABLE_HABIT_LOG  = "habit_log";
+    public static final String COL_HABIT_DATE   = "habit_date";
+    public static final String COL_HABIT_DONE   = "habit_done";
 
 
     public MyDatabaseHelper(@Nullable Context context) {
@@ -158,6 +164,12 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                 + COL_WORKOUT_WEIGHT + " REAL, "
                 + COL_WORKOUT_CALS   + " INTEGER)";
         db.execSQL(CREATE_WORKOUT_TABLE);
+        String CREATE_HABIT_TABLE = "CREATE TABLE " + TABLE_HABIT_LOG + " ("
+                + COL_LOG_ID   + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COLUMN_EMAIL + " TEXT, "
+                + COL_HABIT_DATE + " TEXT, "
+                + COL_HABIT_DONE + " INTEGER DEFAULT 0)";
+        db.execSQL(CREATE_HABIT_TABLE);
 
         prefillFoodLibrary(db);
 
@@ -171,6 +183,7 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOOD_LOG);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOOD_LIBRARY);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_WORKOUT_LOG);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_HABIT_LOG);
         onCreate(db);
 
     }
@@ -657,6 +670,131 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return stats;
+    }
+    public ArrayList<StepEntry> getStepsHistoryList(String email) {
+        ArrayList<StepEntry> history = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Query to pull date and steps sorted chronologically
+        String query = "SELECT " + COL_LOG_DATE + ", " + COL_CUR_STEPS +
+                " FROM " + TABLE_DAILY_LOGS +
+                " WHERE " + COLUMN_EMAIL + " = ?" +
+                " ORDER BY " + COL_LOG_DATE + " ASC";
+
+        Cursor cursor = db.rawQuery(query, new String[]{email});
+
+        if (cursor.moveToFirst()) {
+            do {
+                String date = cursor.getString(0);
+                int steps = cursor.getInt(1);
+                history.add(new StepEntry(date, steps));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return history;
+    }
+    public void setHabitDone(String email, String date, boolean done) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Check if a row exists for this date
+        Cursor cursor = db.rawQuery(
+                "SELECT " + COL_LOG_ID + " FROM " + TABLE_HABIT_LOG
+                        + " WHERE " + COLUMN_EMAIL + " = ? AND " + COL_HABIT_DATE + " = ?",
+                new String[]{email, date}
+        );
+
+        ContentValues cv = new ContentValues();
+        cv.put(COL_HABIT_DONE, done ? 1 : 0);
+
+        if (cursor.getCount() > 0) {
+            db.update(TABLE_HABIT_LOG, cv,
+                    COLUMN_EMAIL + " = ? AND " + COL_HABIT_DATE + " = ?",
+                    new String[]{email, date});
+        } else {
+            cv.put(COLUMN_EMAIL, email);
+            cv.put(COL_HABIT_DATE, date);
+            db.insert(TABLE_HABIT_LOG, null, cv);
+        }
+
+        cursor.close();
+    }
+
+    /**
+     * Returns the set of dates (yyyy-MM-dd) where the habit was completed,
+     * for the 7 dates in the given list.
+     */
+    public java.util.HashSet<String> getCompletedHabitDates(String email, java.util.List<String> dates) {
+        java.util.HashSet<String> done = new java.util.HashSet<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        for (String date : dates) {
+            Cursor cursor = db.rawQuery(
+                    "SELECT " + COL_HABIT_DONE + " FROM " + TABLE_HABIT_LOG
+                            + " WHERE " + COLUMN_EMAIL + " = ? AND " + COL_HABIT_DATE + " = ? AND "
+                            + COL_HABIT_DONE + " = 1",
+                    new String[]{email, date}
+            );
+            if (cursor.getCount() > 0) done.add(date);
+            cursor.close();
+        }
+
+        return done;
+    }
+
+    /**
+     * Checks if the user has met the goal for a given habit on a given date.
+     * Used to auto-check a day when the habit condition is satisfied.
+     *
+     * Returns true if the daily data satisfies the habit requirement.
+     */
+    public boolean doesDailyDataSatisfyHabit(String email, String date, String habitName) {
+        // 1. Defend against null arguments
+        if (habitName == null || email == null || date == null) return false;
+
+        ArrayList<Integer> stats = getDailyStats(email, date);
+        if (stats == null || stats.size() < 4) return false;
+
+        int water    = stats.get(0);
+        int steps    = stats.get(1);
+        int calories = stats.get(2);
+        int protein  = stats.get(3);
+
+        // 2. Query user profile info once instead of repeating inside the switch
+        ArrayList<PersonalInfo> users = getUserList(email);
+        PersonalInfo userProfile = (!users.isEmpty()) ? users.get(0) : null;
+
+        switch (habitName) {
+            case "Eat more protein":
+                return userProfile != null && protein >= userProfile.getProteinGoal();
+
+            case "Drink more water":
+                return userProfile != null && water >= userProfile.getWaterGoal();
+
+            case "Log a daily meal":
+                return calories > 0;
+
+            case "Hit my step goal":
+                return userProfile != null && steps >= userProfile.getStepGoal();
+
+            case "Get more exercise":
+                ArrayList<String> workouts = getWorkoutsForDate(email, date);
+                return workouts != null && !workouts.isEmpty();
+
+            case "Eat more fruit":
+            case "Eat more vegetables":
+            case "Eat more fiber":
+            case "Drink less alcohol":
+            case "Reduce added sugar":
+            case "Sleep 8 hours":
+            case "Meditate daily":
+                // Manually checked by the user via UI toggle
+                return false;
+
+            default:
+                return false;
+        }
     }
 
 }
