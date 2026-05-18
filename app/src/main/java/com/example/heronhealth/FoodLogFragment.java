@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.heronhealth.model.FoodEntry;
+import com.example.heronhealth.model.PersonalInfo;
 import com.google.android.material.button.MaterialButton;
 
 import java.text.SimpleDateFormat;
@@ -32,6 +33,8 @@ public class FoodLogFragment extends Fragment {
     private String mParam2;
 
     private View view;
+    private TextView tvGoalCal, tvFoodCal,
+            tvExerciseCal, tvRemainingCal;
 
     // Date nav
     private ImageButton btnPrevDay, btnNextDay;
@@ -85,12 +88,14 @@ public class FoodLogFragment extends Fragment {
 
         updateDateLabel();
         loadMealData();
+        loadCalorieSummary();
 
         // Date navigation
         btnPrevDay.setOnClickListener(v -> {
             selectedCalendar.add(Calendar.DAY_OF_YEAR, -1);
             updateDateLabel();
             loadMealData();
+            loadCalorieSummary();
         });
 
         btnNextDay.setOnClickListener(v -> {
@@ -101,6 +106,7 @@ public class FoodLogFragment extends Fragment {
                 selectedCalendar.add(Calendar.DAY_OF_YEAR, 1);
                 updateDateLabel();
                 loadMealData();
+                loadCalorieSummary();
             }
         });
 
@@ -126,6 +132,7 @@ public class FoodLogFragment extends Fragment {
         super.onResume();
         // Refresh when returning from FoodSearchActivity
         loadMealData();
+        loadCalorieSummary();
     }
 
     private void initialize() {
@@ -145,6 +152,10 @@ public class FoodLogFragment extends Fragment {
         llBreakfastItems = view.findViewById(R.id.llBreakfastItems);
         llLunchItems     = view.findViewById(R.id.llLunchItems);
         llDinnerItems    = view.findViewById(R.id.llDinnerItems);
+        tvGoalCal      = view.findViewById(R.id.tvGoalCal);
+        tvFoodCal      = view.findViewById(R.id.tvFoodCal);
+        tvExerciseCal  = view.findViewById(R.id.tvExerciseCal);
+        tvRemainingCal = view.findViewById(R.id.tvRemainingCal);
 
         myDb = new MyDatabaseHelper(requireContext());
 
@@ -294,5 +305,53 @@ public class FoodLogFragment extends Fragment {
         intent.putExtra("MEAL_TYPE", mealType);
         intent.putExtra("SELECTED_DATE", getSelectedDateString());
         startActivity(intent);
+    }
+    private void loadCalorieSummary() {
+
+        String date = getSelectedDateString();
+
+        // Get user info
+        ArrayList<PersonalInfo> users =
+                myDb.getUserList(currentUserEmail);
+
+        int goalCalories = 0;
+
+        if (!users.isEmpty()) {
+
+            goalCalories =
+                    users.get(0).getCalorieGoal();
+        }
+
+        // Daily stats already stores food calories
+        ArrayList<Integer> stats =
+                myDb.getDailyStats(currentUserEmail, date);
+
+        int foodCalories = stats.get(2);
+
+        // Exercise calories
+        int exerciseCalories =
+                myDb.getExerciseCalories(
+                        currentUserEmail,
+                        date
+                );
+
+        // Remaining
+        int remaining =
+                goalCalories
+                        - foodCalories
+                        + exerciseCalories;
+
+        // Update UI
+        tvGoalCal.setText(
+                String.valueOf(goalCalories));
+
+        tvFoodCal.setText(
+                String.valueOf(foodCalories));
+
+        tvExerciseCal.setText(
+                String.valueOf(exerciseCalories));
+
+        tvRemainingCal.setText(
+                String.valueOf(remaining));
     }
 }

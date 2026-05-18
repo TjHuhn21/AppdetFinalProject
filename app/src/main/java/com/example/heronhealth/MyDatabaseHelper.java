@@ -208,7 +208,7 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // ── Food library prefill (unchanged) ────────────────────────────────────
+    // ── Food library prefill ────────────────────────────────────
 
     private void prefillFoodLibrary(SQLiteDatabase db) {
         insertLibraryItem(db,"Lean Minced Beef",125,0.0,4.8,22.0,0.0,0.0,1.8,0.5,100,"g");
@@ -732,5 +732,30 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                         && !getWorkoutsForDate(email, date).isEmpty();
             default: return false;
         }
+    }
+    public int getExerciseCalories(String email, String date) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        int total = 0;
+
+        Cursor cursor = db.rawQuery(
+                "SELECT SUM(" + COL_WORKOUT_CALS + ") " +
+                        "FROM " + TABLE_WORKOUT_LOG +
+                        " WHERE " + COLUMN_EMAIL + "=? " +
+                        "AND " + COL_WORKOUT_DATE + "=?",
+                new String[]{email, date}
+        );
+
+        if (cursor.moveToFirst()) {
+
+            total = cursor.isNull(0)
+                    ? 0
+                    : cursor.getInt(0);
+        }
+
+        cursor.close();
+
+        return total;
     }
 }
