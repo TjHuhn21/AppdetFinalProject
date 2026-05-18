@@ -21,22 +21,24 @@ import com.example.heronhealth.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this); // ← move BEFORE setContentView
         binding = ActivityMainBinding.inflate(getLayoutInflater());
-        EdgeToEdge.enable(this);
         setContentView(binding.getRoot());
-        replaceFragment(new DashboardFragment());
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+
+        // Use binding directly instead of findViewById — safer with ViewBinding
+        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
+
+        replaceFragment(new DashboardFragment());
+
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-
             if (id == R.id.dashboard) {
                 replaceFragment(new DashboardFragment());
             } else if (id == R.id.log) {
@@ -44,10 +46,8 @@ public class MainActivity extends AppCompatActivity {
             } else if (id == R.id.nav_more) {
                 replaceFragment(new MoreOptionFragment());
             }
-
             return true;
         });
-
     }
     private void replaceFragment(Fragment fragment){
             FragmentManager fragmentManager = getSupportFragmentManager();

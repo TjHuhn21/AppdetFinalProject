@@ -77,28 +77,31 @@ public class DashboardFragment extends Fragment {
     private LineChart weightLineChart, stepLineChart;
     private MaterialButton btnAddWeight;
 
-    // Weekly habits card views
+    // Weekly habits
     private TextView tvHabitSubtitle;
     private MaterialButton btnStartHabit;
 
-    // Day circles: FrameLayouts (background) + date TextViews + check ImageViews
     private FrameLayout[] dayFrames    = new FrameLayout[7];
     private TextView[]    dayDateTexts = new TextView[7];
     private ImageView[]   dayChecks    = new ImageView[7];
 
     private MyDatabaseHelper myDb;
     private String currentUserEmail;
-    private int waterGoalMl, stepGoal, currentWaterValue = 0;
     private String todayDate;
 
-    // The 7 date strings (yyyy-MM-dd) for Mon–Sun of the current week
+    // ── Goal fields — single source of truth ────────────────────────────────
+    private int calorieGoalField = 0; // 0 means "not loaded yet"
+    private int proteinGoalField = 0;
+    private int waterGoalMl      = 0;
+    private int stepGoal         = 0;
+    private int currentWaterValue = 0;
+
     private final List<String> weekDates = new ArrayList<>();
 
     private static final String PREF_STEPS_OFFSET  = "steps_at_start_of_day";
     private static final String PREF_LAST_LOG_DATE = "last_log_date";
     private static final String PREF_WEIGHT_SEEDED = "weight_chart_seeded";
 
-    // Live step updates from StepCounterService
     private final BroadcastReceiver stepReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -106,8 +109,6 @@ public class DashboardFragment extends Fragment {
             int stepsToday = intent.getIntExtra(StepCounterService.EXTRA_STEPS_TODAY, 0);
             tvStepCountValue.setText(String.valueOf(stepsToday));
             pbStepsProgress.setProgress(Math.min(stepsToday, pbStepsProgress.getMax()));
-
-            // Auto-check today's habit circle if applicable
             autoCheckTodayHabit();
         }
     };
@@ -138,7 +139,6 @@ public class DashboardFragment extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
-        // Request ACTIVITY_RECOGNITION permission
         if (ContextCompat.checkSelfPermission(requireContext(),
                 android.Manifest.permission.ACTIVITY_RECOGNITION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -146,7 +146,6 @@ public class DashboardFragment extends Fragment {
                     new String[]{android.Manifest.permission.ACTIVITY_RECOGNITION}, 1);
         }
 
-        // Start step service
         Intent serviceIntent = new Intent(getContext(), StepCounterService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             requireContext().startForegroundService(serviceIntent);
@@ -172,39 +171,34 @@ public class DashboardFragment extends Fragment {
         currentUserEmail = sharedPref.getString("userEmail", "");
         myDb.checkAndInitDailyLog(currentUserEmail, todayDate);
         seedInitialWeightIfNeeded(sharedPref);
+
+        // Load goals first — populates calorieGoalField, proteinGoalField, etc.
         checkAndLoadData();
 
-        // Build the week date list once
         buildWeekDates();
 
-        // Calories card
-        caloriesCardView.setOnClickListener(v ->
+        // Click listeners
+       /* caloriesCardView.setOnClickListener(v ->
                 startActivity(new Intent(getContext(), NutritionActivity.class)));
 
-        // Water
         btnUpdateWater.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), WaterAddActivity.class);
             intent.putExtra("CURRENT_WATER", currentWaterValue);
             intent.putExtra("TARGET_WATER", waterGoalMl);
             startActivity(intent);
-        });
+        });*/
 
-        // Workout
         btnLogWorkout.setOnClickListener(v ->
                 startActivity(new Intent(getContext(), AddExerciseActivity.class)));
 
-        // Weight
         btnAddWeight.setOnClickListener(v ->
                 startActivity(new Intent(getContext(), UpdateWeightActivity.class)));
 
-        // Step goal
         btnEditStepGoal.setOnClickListener(v -> showEditStepGoalDialog());
 
-        // Weekly habit "Start a habit" / "Change habit" button
         btnStartHabit.setOnClickListener(v ->
                 startActivity(new Intent(getContext(), HabitPickerActivity.class)));
 
-        // Day circles — manually toggle when user taps (for habits that can't be auto-detected)
         for (int i = 0; i < 7; i++) {
             final int idx = i;
             dayFrames[i].setOnClickListener(v -> toggleHabitDay(idx));
@@ -224,6 +218,10 @@ public class DashboardFragment extends Fragment {
             requireContext().registerReceiver(stepReceiver, filter);
         }
 
+        // Re-load goals in case they changed (e.g. user updated profile)
+        checkAndLoadData();
+
+        // Then refresh stats using the freshly loaded goal fields
         refreshDashboardStats();
     }
 
@@ -233,6 +231,15 @@ public class DashboardFragment extends Fragment {
         try {
             requireContext().unregisterReceiver(stepReceiver);
         } catch (IllegalArgumentException ignored) { }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (myDb != null) {
+            myDb.close();
+            myDb = null;
+        }
     }
 
     @Override
@@ -247,24 +254,19 @@ public class DashboardFragment extends Fragment {
                 requireContext().startService(serviceIntent);
             }
         } else if (requestCode == 1) {
-            Toast.makeText(getContext(), "Permission denied. Steps cannot be tracked.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(),
+                    "Permission denied. Steps cannot be tracked.", Toast.LENGTH_SHORT).show();
         }
     }
 
     // ── WEEKLY HABITS ────────────────────────────────────────────────────────
 
-    /**
-     * Builds the list of 7 date strings for Mon–Sun of the current week.
-     */
     private void buildWeekDates() {
         weekDates.clear();
-
         Calendar cal = Calendar.getInstance();
         int dow = cal.get(Calendar.DAY_OF_WEEK);
-        // Roll back to Monday
         int daysBack = (dow == Calendar.SUNDAY) ? 6 : dow - Calendar.MONDAY;
         cal.add(Calendar.DAY_OF_YEAR, -daysBack);
-
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         for (int i = 0; i < 7; i++) {
             weekDates.add(sdf.format(cal.getTime()));
@@ -272,10 +274,6 @@ public class DashboardFragment extends Fragment {
         }
     }
 
-    /**
-     * Updates the entire weekly habits card UI.
-     * Called on onResume and after returning from HabitPickerActivity.
-     */
     private void refreshHabitsCard() {
         if (!isAdded() || getContext() == null) return;
 
@@ -286,11 +284,9 @@ public class DashboardFragment extends Fragment {
         String habitEmoji = prefs.getString(HabitPickerActivity.PREF_HABIT_EMOJI, "");
         String weekStart  = prefs.getString(HabitPickerActivity.PREF_HABIT_WEEK_START, "");
 
-        // If no habit chosen yet — show "choose" state
         if (habitName.isEmpty()) {
             tvHabitSubtitle.setText("Choose a habit to track this week.");
             btnStartHabit.setText("Start a habit");
-            // Hide all circles / grey them out
             for (int i = 0; i < 7; i++) {
                 dayFrames[i].setAlpha(0.35f);
                 dayChecks[i].setVisibility(View.GONE);
@@ -298,11 +294,9 @@ public class DashboardFragment extends Fragment {
             return;
         }
 
-        // Habit is set — show name and "Change" button
         tvHabitSubtitle.setText(habitEmoji + " " + habitName);
         btnStartHabit.setText("Change habit");
 
-        // Fill in day numbers (day of month) for the week
         Calendar cal = Calendar.getInstance();
         try {
             Date start = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(weekStart);
@@ -310,76 +304,50 @@ public class DashboardFragment extends Fragment {
         } catch (Exception ignored) { }
 
         for (int i = 0; i < 7; i++) {
-            int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-            dayDateTexts[i].setText(String.valueOf(dayOfMonth));
+            dayDateTexts[i].setText(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
             dayFrames[i].setAlpha(1f);
             cal.add(Calendar.DAY_OF_YEAR, 1);
         }
 
-        // Fetch which days are already marked done
-        HashSet<String> doneDates =
-                myDb.getCompletedHabitDates(currentUserEmail, weekDates);
+        HashSet<String> doneDates = myDb.getCompletedHabitDates(currentUserEmail, weekDates);
 
-        // Auto-check days that can be verified from logged data
         for (String date : weekDates) {
             if (!doneDates.contains(date)) {
-                boolean autoSatisfied =
-                        myDb.doesDailyDataSatisfyHabit(currentUserEmail, date, habitName);
-                if (autoSatisfied) {
+                if (myDb.doesDailyDataSatisfyHabit(currentUserEmail, date, habitName)) {
                     myDb.setHabitDone(currentUserEmail, date, true);
                     doneDates.add(date);
                 }
             }
         }
 
-        // Apply check/uncheck visuals for each circle
         for (int i = 0; i < 7; i++) {
             boolean done = doneDates.contains(weekDates.get(i));
             dayFrames[i].setBackgroundResource(done
-                    ? R.drawable.circle_done
-                    : R.drawable.box_uncheck);
+                    ? R.drawable.circle_done : R.drawable.box_uncheck);
             dayChecks[i].setVisibility(done ? View.VISIBLE : View.GONE);
-            dayDateTexts[i].setVisibility(done ? View.GONE  : View.VISIBLE);
+            dayDateTexts[i].setVisibility(done ? View.GONE : View.VISIBLE);
         }
     }
 
-    /**
-     * Toggles a day circle when the user taps it manually.
-     * Only allow toggling today or past days — not future.
-     */
     private void toggleHabitDay(int index) {
         if (!isAdded() || getContext() == null) return;
-
         SharedPreferences prefs = requireContext()
                 .getSharedPreferences("HeronHealthPrefs", Context.MODE_PRIVATE);
-
         String habitName = prefs.getString(HabitPickerActivity.PREF_HABIT_NAME, "");
-
         if (habitName.isEmpty()) {
             Toast.makeText(getContext(), "Pick a habit first!", Toast.LENGTH_SHORT).show();
             return;
         }
-
         String date = weekDates.get(index);
-
-        // Don't allow checking future days
         if (date.compareTo(todayDate) > 0) {
             Toast.makeText(getContext(), "Can't check a future day.", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        // Toggle
         HashSet<String> done = myDb.getCompletedHabitDates(currentUserEmail, weekDates);
-        boolean wasDone = done.contains(date);
-        myDb.setHabitDone(currentUserEmail, date, !wasDone);
-
-        // Refresh visuals
+        myDb.setHabitDone(currentUserEmail, date, !done.contains(date));
         refreshHabitsCard();
     }
 
-    /**
-     * Called from the step broadcast receiver — auto-checks today if step goal is the habit.
-     */
     private void autoCheckTodayHabit() {
         if (!isAdded() || getContext() == null) return;
         SharedPreferences prefs = requireContext()
@@ -393,7 +361,6 @@ public class DashboardFragment extends Fragment {
     // ── INIT ─────────────────────────────────────────────────────────────────
 
     private void initialize() {
-
         caloriesCardView    = view.findViewById(R.id.cardCalories);
         progressCaloriesBar = view.findViewById(R.id.progressCaloriesBar);
         tvRemainingValue    = view.findViewById(R.id.tvRemainingValue);
@@ -419,16 +386,14 @@ public class DashboardFragment extends Fragment {
         stepLineChart   = view.findViewById(R.id.StepsLineChart);
         btnAddWeight    = view.findViewById(R.id.btnAddWeight);
 
-        // Weekly habits card
         tvHabitSubtitle = view.findViewById(R.id.tvHabitSubtitle);
         btnStartHabit   = view.findViewById(R.id.btnStartHabit);
 
-        // Day circles — IDs from the layout
-        int[] frameIds   = {R.id.frameMonDay, R.id.frameTueDay, R.id.frameWedDay,
+        int[] frameIds = {R.id.frameMonDay, R.id.frameTueDay, R.id.frameWedDay,
                 R.id.frameThuDay, R.id.frameFriDay, R.id.frameSatDay, R.id.frameSunDay};
-        int[] dateIds    = {R.id.tvMon, R.id.tvTue, R.id.tvWed,
+        int[] dateIds  = {R.id.tvMon, R.id.tvTue, R.id.tvWed,
                 R.id.tvThu, R.id.tvFri, R.id.tvSat, R.id.tvSun};
-        int[] checkIds   = {R.id.imgMon, R.id.imgTue, R.id.imgWed,
+        int[] checkIds = {R.id.imgMon, R.id.imgTue, R.id.imgWed,
                 R.id.imgThu, R.id.imgFri, R.id.imgSat, R.id.imgSun};
 
         for (int i = 0; i < 7; i++) {
@@ -440,40 +405,147 @@ public class DashboardFragment extends Fragment {
         myDb = new MyDatabaseHelper(requireContext());
     }
 
+    // ── GOALS ────────────────────────────────────────────────────────────────
+
+    /**
+     * Loads the user's goals from the DB into the goal fields AND updates the UI.
+     * Must be called before refreshDashboardStats().
+     */
+    private void checkAndLoadData() {
+            ArrayList<PersonalInfo> users = myDb.getUserList(currentUserEmail);
+            if (!users.isEmpty()) {
+                PersonalInfo user = users.get(0);
+                calorieGoalField = user.getCalorieGoal();
+                proteinGoalField = user.getProteinGoal();
+                waterGoalMl      = user.getWaterGoal();
+                stepGoal         = user.getStepGoal();
+                applyGoalsToUI();
+            }
+    }
+
+    private void calculateInitialGoals(PersonalInfo user) {
+        double weightKg = Double.parseDouble(user.getWeight());
+        double heightCm = Double.parseDouble(user.getHeight());
+        int age          = calculateAge(user.getDateOfBirth());
+        String gender    = user.getGender();
+        String activity  = user.getActivityLevel();
+        String goal      = user.getGoal();
+
+        // ── Step 1: BMR (Mifflin-St Jeor) ───────────────────────────────────────
+        double bmr = gender.equalsIgnoreCase("Male")
+                ? (10 * weightKg) + (6.25 * heightCm) - (5 * age) + 5
+                : (10 * weightKg) + (6.25 * heightCm) - (5 * age) - 161;
+
+        // ── Step 2: TDEE ─────────────────────────────────────────────────────────
+        double tdee;
+        switch (activity) {
+            case "Lightly Active": tdee = bmr * 1.375; break;
+            case "Active":         tdee = bmr * 1.55;  break;
+            case "Very Active":    tdee = bmr * 1.725; break;
+            default:               tdee = bmr * 1.2;   break; // Sedentary
+        }
+
+        // ── Step 3: Calorie goal based on user goal ───────────────────────────────
+        calorieGoalField = goal.equalsIgnoreCase("Lose Weight") ? (int)(tdee - 500)
+                : goal.equalsIgnoreCase("Gain Muscle")          ? (int)(tdee + 300)
+                : (int) tdee;
+
+        // ── Step 4: Macros (NASM guidelines) ─────────────────────────────────────
+
+        // Protein: 1.6g/kg for active users (midpoint of 1.4–2.2 range), 1.1g/kg sedentary
+        boolean isActive = activity.equals("Active") || activity.equals("Very Active");
+        proteinGoalField = isActive
+                ? (int)(weightKg * 1.6)
+                : (int)(weightKg * 1.1);
+
+        // Fat: minimum 1g/kg (NASM recommendation)
+        int fatGoal = (int)(weightKg * 1.0);
+
+        // Carbs: 55% of total calories is the midpoint of the 45–65% NASM range
+        // 4 calories per gram of carbohydrate
+        int carbGoal = (int)((calorieGoalField * 0.55) / 4.0);
+
+        // Water: 1 oz per 2 lbs body weight, converted to ml (1 oz = 29.5735 ml)
+        // weightKg → lbs = weightKg * 2.20462
+        double weightLbs = weightKg * 2.20462;
+        waterGoalMl = (int)((weightLbs / 2.0) * 29.5735);
+
+        // Steps: sensible default
+        stepGoal = 7000;
+
+        // ── Persist to DB ─────────────────────────────────────────────────────────
+        myDb.updateGoals(currentUserEmail, calorieGoalField, stepGoal, waterGoalMl, proteinGoalField);
+        myDb.updateMacroGoals(currentUserEmail, carbGoal, fatGoal, 30, 50, 20, 15);
+
+        applyGoalsToUI();
+    }
+
+    /**
+     * Pushes the goal fields to all UI elements.
+     * Separated from the field-loading logic so it's always consistent.
+     */
+    private void applyGoalsToUI() {
+        tvBaseGoal.setText("Base Goal: " + calorieGoalField);
+        tvRemainingValue.setText(String.valueOf(calorieGoalField));
+        progressCaloriesBar.setMax(calorieGoalField);
+
+        tvProteinLabel.setText("Protein: 0g / " + proteinGoalField + "g");
+
+        tvStepGoalLabel.setText("/ " + stepGoal + " steps");
+        pbStepsProgress.setMax(stepGoal);
+
+        tvTargetWater.setText("Target: " + waterGoalMl + " ml");
+        pbWaterIntake.setMax(waterGoalMl);
+    }
+
+    private int calculateAge(String dobString) {
+        try {
+            String[] parts = dobString.split("/");
+            Calendar dob = Calendar.getInstance();
+            dob.set(Integer.parseInt(parts[2]), Integer.parseInt(parts[1]) - 1, Integer.parseInt(parts[0]));
+            Calendar today = Calendar.getInstance();
+            int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
+            if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) age--;
+            return age;
+        } catch (Exception e) { return 25; }
+    }
+
     // ── STATS ────────────────────────────────────────────────────────────────
 
     private void refreshDashboardStats() {
+        if (calorieGoalField == 0) return; // goals not loaded yet, skip
 
         ArrayList<Integer> dailyData = myDb.getDailyStats(currentUserEmail, todayDate);
 
         if (dailyData.size() >= 4) {
-
             int water    = dailyData.get(0);
             int steps    = dailyData.get(1);
             int calories = dailyData.get(2);
             int protein  = dailyData.get(3);
 
             currentWaterValue = water;
+
+            // Water
             tvWaterCount.setText(water + " ml");
-            pbWaterIntake.setProgress(Math.min(water, pbWaterIntake.getMax()));
+            pbWaterIntake.setProgress(Math.min(water, waterGoalMl));
 
+            // Steps
             tvStepCountValue.setText(String.valueOf(steps));
-            pbStepsProgress.setProgress(Math.min(steps, pbStepsProgress.getMax()));
+            pbStepsProgress.setProgress(Math.min(steps, stepGoal));
 
-            int calorieGoal = progressCaloriesBar.getMax() > 0
-                    ? progressCaloriesBar.getMax() : 2000;
-            int remaining = Math.max(0, calorieGoal - calories);
+            // Calories — always use calorieGoalField, never progressCaloriesBar.getMax()
+            int remaining = Math.max(0, calorieGoalField - calories);
             tvRemainingValue.setText(String.valueOf(remaining));
-            progressCaloriesBar.setProgress(Math.min(calories, progressCaloriesBar.getMax()));
+            progressCaloriesBar.setProgress(Math.min(calories, calorieGoalField));
             tvFoodEaten.setText("Food: " + calories + " kcal");
-            tvProteinLabel.setText("Protein: " + protein + "g");
+
+            // Protein — always use proteinGoalField
+            tvProteinLabel.setText("Protein: " + protein + "g / " + proteinGoalField + "g");
         }
 
         refreshWorkoutStatus();
         loadWeightChart();
         loadStepsChart();
-
-        // Safe explicit UI state parsing for habit verification
         refreshHabitsCard();
     }
 
@@ -504,14 +576,10 @@ public class DashboardFragment extends Fragment {
             labels.add(formatChartDate(we.getDate()));
         }
         LineDataSet ds = new LineDataSet(entries, "Weight (kg)");
-        ds.setColor(0xFF2D9CDB);
-        ds.setCircleColor(0xFF2D9CDB);
-        ds.setValueTextColor(0xFF000000);
-        ds.setLineWidth(2f);
-        ds.setCircleRadius(4f);
-        ds.setDrawValues(true);
-        ds.setValueTextSize(10f);
-        ds.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        ds.setColor(0xFF2D9CDB);       ds.setCircleColor(0xFF2D9CDB);
+        ds.setValueTextColor(0xFF000000); ds.setLineWidth(2f);
+        ds.setCircleRadius(4f);        ds.setDrawValues(true);
+        ds.setValueTextSize(10f);      ds.setMode(LineDataSet.Mode.CUBIC_BEZIER);
 
         weightLineChart.setData(new LineData(ds));
         XAxis x = weightLineChart.getXAxis();
@@ -521,7 +589,8 @@ public class DashboardFragment extends Fragment {
         weightLineChart.getAxisRight().setEnabled(false);
         weightLineChart.getDescription().setEnabled(false);
         weightLineChart.getLegend().setEnabled(false);
-        weightLineChart.animateX(500); weightLineChart.invalidate();
+        weightLineChart.animateX(500);
+        weightLineChart.invalidate();
     }
 
     private void loadStepsChart() {
@@ -540,14 +609,10 @@ public class DashboardFragment extends Fragment {
             labels.add(formatChartDate(se.getDate()));
         }
         LineDataSet ds = new LineDataSet(entries, "Steps");
-        ds.setColor(0xFF4CAF50);
-        ds.setCircleColor(0xFF4CAF50);
-        ds.setValueTextColor(0xFF000000);
-        ds.setLineWidth(2f);
-        ds.setCircleRadius(4f);
-        ds.setDrawValues(true);
-        ds.setValueTextSize(10f);
-        ds.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        ds.setColor(0xFF4CAF50);       ds.setCircleColor(0xFF4CAF50);
+        ds.setValueTextColor(0xFF000000); ds.setLineWidth(2f);
+        ds.setCircleRadius(4f);        ds.setDrawValues(true);
+        ds.setValueTextSize(10f);      ds.setMode(LineDataSet.Mode.CUBIC_BEZIER);
 
         stepLineChart.setData(new LineData(ds));
         XAxis x = stepLineChart.getXAxis();
@@ -557,7 +622,8 @@ public class DashboardFragment extends Fragment {
         stepLineChart.getAxisRight().setEnabled(false);
         stepLineChart.getDescription().setEnabled(false);
         stepLineChart.getLegend().setEnabled(false);
-        stepLineChart.animateX(500); stepLineChart.invalidate();
+        stepLineChart.animateX(500);
+        stepLineChart.invalidate();
     }
 
     private String formatChartDate(String rawDate) {
@@ -575,7 +641,7 @@ public class DashboardFragment extends Fragment {
         EditText input = new EditText(requireContext());
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
         input.setHint("e.g. 10000");
-        input.setText(String.valueOf(pbStepsProgress.getMax()));
+        input.setText(String.valueOf(stepGoal));
         builder.setView(input);
         builder.setPositiveButton("Save", (dialog, which) -> {
             String val = input.getText().toString().trim();
@@ -594,7 +660,8 @@ public class DashboardFragment extends Fragment {
                         tvStepGoalLabel.setText("/ " + stepGoal + " steps");
                         Toast.makeText(getContext(), "Step goal updated!", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(getContext(), "Please enter a positive step goal.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(),
+                                "Please enter a positive step goal.", Toast.LENGTH_SHORT).show();
                     }
                 } catch (NumberFormatException e) {
                     Toast.makeText(getContext(), "Invalid number.", Toast.LENGTH_SHORT).show();
@@ -605,7 +672,7 @@ public class DashboardFragment extends Fragment {
         builder.show();
     }
 
-    // ── GOALS ────────────────────────────────────────────────────────────────
+    // ── SEED WEIGHT ──────────────────────────────────────────────────────────
 
     private void seedInitialWeightIfNeeded(SharedPreferences sharedPref) {
         if (sharedPref.getBoolean(PREF_WEIGHT_SEEDED, false)) return;
@@ -620,64 +687,5 @@ public class DashboardFragment extends Fragment {
             }
         }
         sharedPref.edit().putBoolean(PREF_WEIGHT_SEEDED, true).apply();
-    }
-
-    private void calculateInitialGoals(PersonalInfo user) {
-        double weight = Double.parseDouble(user.getWeight());
-        double height = Double.parseDouble(user.getHeight());
-        int age = calculateAge(user.getDateOfBirth());
-        String gender = user.getGender(), activity = user.getActivityLevel(), goal = user.getGoal();
-        double bmr = gender.equalsIgnoreCase("Male")
-                ? (10 * weight) + (6.25 * height) - (5 * age) + 5
-                : (10 * weight) + (6.25 * height) - (5 * age) - 161;
-        double tdee;
-        switch (activity) {
-            case "Lightly Active": tdee = bmr * 1.375; break;
-            case "Active":         tdee = bmr * 1.55;  break;
-            case "Very Active":    tdee = bmr * 1.725; break;
-            default:               tdee = bmr * 1.2;   break;
-        }
-        int finalCalorieGoal = goal.equalsIgnoreCase("Lose Weight") ? (int)(tdee - 500)
-                : goal.equalsIgnoreCase("Gain Muscle") ? (int)(tdee + 300) : (int) tdee;
-        waterGoalMl = (int)((weight * 2.20462 / 2.0) * 29.57);
-        int proteinGoal = (int)(weight * 2.0);
-        stepGoal = 7000;
-        myDb.updateGoals(currentUserEmail, finalCalorieGoal, stepGoal, waterGoalMl, proteinGoal);
-        displayGoals(finalCalorieGoal, proteinGoal, waterGoalMl, stepGoal);
-    }
-
-    private int calculateAge(String dobString) {
-        try {
-            String[] parts = dobString.split("/");
-            Calendar dob = Calendar.getInstance();
-            dob.set(Integer.parseInt(parts[2]), Integer.parseInt(parts[1]) - 1, Integer.parseInt(parts[0]));
-            Calendar today = Calendar.getInstance();
-            int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
-            if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) age--;
-            return age;
-        } catch (Exception e) { return 25; }
-    }
-
-    private void checkAndLoadData() {
-        ArrayList<PersonalInfo> users = myDb.getUserList(currentUserEmail);
-        if (!users.isEmpty()) {
-            PersonalInfo user = users.get(0);
-            if (user.getCalorieGoal() == 0) calculateInitialGoals(user);
-            else displayGoals(user.getCalorieGoal(), user.getProteinGoal(),
-                    user.getWaterGoal(), user.getStepGoal());
-        }
-    }
-
-
-    private void displayGoals(int calories, int protein, int water, int steps) {
-        waterGoalMl = water; stepGoal = steps;
-        tvBaseGoal.setText("Base Goal: " + calories);
-        tvRemainingValue.setText(String.valueOf(calories));
-        progressCaloriesBar.setMax(calories);
-        tvProteinLabel.setText("Protein: 0g / " + protein + "g");
-        tvStepGoalLabel.setText("/ " + steps + " steps");
-        pbStepsProgress.setMax(steps);
-        tvTargetWater.setText("Target: " + water + " ml");
-        pbWaterIntake.setMax(water);
     }
 }

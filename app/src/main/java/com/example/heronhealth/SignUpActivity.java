@@ -75,85 +75,129 @@ public class SignUpActivity extends AppCompatActivity {
         userRegister();
     }
     public void userRegister() {
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String username = etUsername.getText().toString().trim();
-                String password = etPassword.getText().toString().trim();
-                String email = etEmail.getText().toString().trim();
-                String birthday = etBirthday.getText().toString().trim();
+        btnRegister.setOnClickListener(view -> {
+            String username     = etUsername.getText().toString().trim();
+            String password     = etPassword.getText().toString().trim();
+            String email        = etEmail.getText().toString().trim();
+            String birthday     = etBirthday.getText().toString().trim();
+            String gender       = spnrGender.getSelectedItem().toString();
+            String goal         = spnrGoal.getSelectedItem().toString();
+            String activityLevel= spnrActivityLevel.getSelectedItem().toString();
 
-
-                String gender = spnrGender.getSelectedItem().toString();
-                String goal = spnrGoal.getSelectedItem().toString();
-                String activityLevel = spnrActivityLevel.getSelectedItem().toString();
-
-                //validations
-                if (username.isEmpty() || password.isEmpty() || email.isEmpty() ||
-                        birthday.isEmpty() || etWeight.getText().toString().isEmpty() ||
-                        etHeight.getText().toString().isEmpty()) {
-                    displayMessage("Input Error!", "Please fill all fields");
-                    return;
-                }
-                String PASSWORD_PATTERN =
-                        "^(?=.*[0-9])" +         // at least one digit
-                                "(?=.*[a-z])" +         // at least one lowercase letter
-                                "(?=.*[A-Z])" +         // at least one uppercase letter
-                                "(?=.*[!@#$%^&*()-+=])" + // at least one special character
-                                "(?=\\S+$)" +           // no whitespace allowed
-                                ".{8,20}$";
-
-                if (!password.matches(PASSWORD_PATTERN)) {
-                    displayMessage("Weak Password",
-                            "Password must be at least 8 characters long, including " +
-                                    "uppercase, lowercase, a number, and a special character (@#$%^&+=!).");
-                    return;
-                }
-                if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    displayMessage("Invalid Email", "Please enter a valid email address.");
-                    return;
-                }
-                if (userAge < 14 || userAge > 120) {
-                    displayMessage("Age Restriction", "You must be at least 14 years old.");
-                    return;
-                }
-
-                double weight = Double.parseDouble(etWeight.getText().toString());
-                double height = Double.parseDouble(etHeight.getText().toString());
-
-                if (weight < 20 || weight > 500) {
-                    displayMessage("Invalid Weight", "Please enter a realistic weight in kg.");
-                    return;
-                }
-                if (height < 50 || height > 250) {
-                    displayMessage("Invalid Height", "Please enter a realistic height in cm.");
-                    return;
-                }
-
-                //add user to database
-                boolean success = myDb.addUser(username, password, email,birthday, gender, weight, height, goal, activityLevel);
-
-                if (success) {
-                    successMessage.setCancelable(false);
-                    successMessage.setTitle("Success");
-                    successMessage.setMessage("Welcome to HeronHealth!");
-
-                    successMessage.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
-                    });
-
-                    successMessage.show();
-
-                } else {
-                    successMessage.setCancelable(true);
-                    displayMessage("Error", "Username or Email already exists.");
-                }
+            // ── Validations ───────────────────────────────────────────────────────
+            if (username.isEmpty() || password.isEmpty() || email.isEmpty() ||
+                    birthday.isEmpty() || etWeight.getText().toString().isEmpty() ||
+                    etHeight.getText().toString().isEmpty()) {
+                displayMessage("Input Error!", "Please fill all fields");
+                return;
             }
+
+            String PASSWORD_PATTERN =
+                    "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()-+=])(?=\\S+$).{8,20}$";
+            if (!password.matches(PASSWORD_PATTERN)) {
+                displayMessage("Weak Password",
+                        "Password must be 8–20 characters with uppercase, lowercase, " +
+                                "a number, and a special character.");
+                return;
+            }
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                displayMessage("Invalid Email", "Please enter a valid email address.");
+                return;
+            }
+            if (userAge < 14 || userAge > 120) {
+                displayMessage("Age Restriction", "You must be at least 14 years old.");
+                return;
+            }
+
+            double weightKg, heightCm;
+            try {
+                weightKg = Double.parseDouble(etWeight.getText().toString());
+                heightCm = Double.parseDouble(etHeight.getText().toString());
+            } catch (NumberFormatException e) {
+                displayMessage("Invalid Input", "Please enter valid numbers for weight and height.");
+                return;
+            }
+
+            if (weightKg < 20 || weightKg > 500) {
+                displayMessage("Invalid Weight", "Please enter a realistic weight in kg.");
+                return;
+            }
+            if (heightCm < 50 || heightCm > 250) {
+                displayMessage("Invalid Height", "Please enter a realistic height in cm.");
+                return;
+            }
+
+            // ── Step 1: Register user ─────────────────────────────────────────────
+            boolean success = myDb.addUser(username, password, email, birthday,
+                    gender, weightKg, heightCm, goal, activityLevel);
+
+            if (!success) {
+                displayMessage("Error", "Username or Email already exists.");
+                return;
+            }
+
+            // ── Step 2: Calculate BMR (Mifflin-St Jeor) ──────────────────────────
+            double bmr = gender.equalsIgnoreCase("Male")
+                    ? (10 * weightKg) + (6.25 * heightCm) - (5 * userAge) + 5
+                    : (10 * weightKg) + (6.25 * heightCm) - (5 * userAge) - 161;
+
+            // ── Step 3: TDEE ──────────────────────────────────────────────────────
+            double tdee;
+            switch (activityLevel) {
+                case "Lightly Active": tdee = bmr * 1.375; break;
+                case "Active":         tdee = bmr * 1.55;  break;
+                case "Very Active":    tdee = bmr * 1.725; break;
+                default:               tdee = bmr * 1.2;   break; // Not Very Active / Sedentary
+            }
+
+            // ── Step 4: Calorie goal ──────────────────────────────────────────────
+            int calorieGoal = goal.equalsIgnoreCase("Lose Weight") ? (int)(tdee - 500)
+                    : goal.equalsIgnoreCase("Gain Muscle")         ? (int)(tdee + 300)
+                    : (int) tdee;
+
+            // ── Step 5: Macros (NASM guidelines) ─────────────────────────────────
+            // Protein: 1.6g/kg active, 1.1g/kg sedentary/lightly active
+            boolean isActive = activityLevel.equals("Active") || activityLevel.equals("Very Active");
+            int proteinGoal = isActive ? (int)(weightKg * 1.6) : (int)(weightKg * 1.1);
+
+            // Fat: minimum 1g/kg body weight
+            int fatGoal  = (int)(weightKg * 1.0);
+
+            // Carbs: 55% of calories ÷ 4 kcal/g (midpoint of NASM's 45–65% range)
+            int carbGoal = (int)((calorieGoal * 0.55) / 4.0);
+
+            // Fiber: 30g general recommendation
+            int fiberGoal = 30;
+
+            // Sugar: 50g general recommendation
+            int sugarGoal = 50;
+
+            // Saturated fat: 20g general recommendation
+            int satFatGoal = 20;
+
+            // Polyunsaturated fat: 15g general recommendation
+            int polyGoal = 15;
+
+            // ── Step 6: Water (Kinetico: 1 oz per 2 lbs → ml) ───────────────────
+            double weightLbs = weightKg * 2.20462;
+            int waterGoalMl  = (int)((weightLbs / 2.0) * 29.5735);
+
+            // ── Step 7: Steps default ─────────────────────────────────────────────
+            int stepGoal = 7000;
+
+            // ── Step 8: Save all goals to DB ──────────────────────────────────────
+            myDb.updateGoals(email, calorieGoal, stepGoal, waterGoalMl, proteinGoal);
+            myDb.updateMacroGoals(email, carbGoal, fatGoal, fiberGoal, sugarGoal, satFatGoal, polyGoal);
+
+            // ── Success ───────────────────────────────────────────────────────────
+            successMessage.setCancelable(false);
+            successMessage.setTitle("Success");
+            successMessage.setMessage("Welcome to HeronHealth!");
+            successMessage.setPositiveButton("OK", (dialog, i) -> {
+                startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
+                finish();
+            });
+            successMessage.show();
         });
     }
     public void setEtBirthday(){

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 class MyDatabaseHelper extends SQLiteOpenHelper {
     private Context context;
     private static final String DATABASE_NAME = "HeronHealth.db";
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 12;
 
     private static final String TABLE_NAME = "heron_User";
     private static final String COLUMN_ID = "user_ID";
@@ -38,8 +38,6 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_PROTEIN_GOAL = "user_protein_goal";
     private static final String COLUMN_WATER_GOAL = "user_water_goal";
     private static final String COLUMN_STEP_GOAL = "user_step_goal";
-
-    // ── New macro goal columns ───────────────────────────────────────────────
     private static final String COLUMN_CARB_GOAL    = "user_carb_goal";
     private static final String COLUMN_FAT_GOAL     = "user_fat_goal";
     private static final String COLUMN_FIBER_GOAL   = "user_fiber_goal";
@@ -47,13 +45,11 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_SAT_FAT_GOAL = "user_sat_fat_goal";
     private static final String COLUMN_POLY_GOAL    = "user_poly_goal";
 
-    // Weight Progress Table
     public static final String TABLE_WEIGHT     = "weight_progress";
     public static final String COL_WEIGHT_ID    = "weight_id";
     public static final String COL_WEIGHT_VALUE = "weight_value";
     public static final String COL_WEIGHT_DATE  = "weight_date";
 
-    // Daily Logs Table
     public static final String TABLE_DAILY_LOGS  = "daily_logs";
     public static final String COL_LOG_ID        = "log_id";
     public static final String COL_LOG_DATE      = "log_date";
@@ -62,7 +58,6 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_CUR_PROTEIN   = "current_protein";
     public static final String COL_CUR_CALORIES  = "current_calories";
 
-    // Food Log Table
     public static final String TABLE_FOOD_LOG    = "food_log";
     public static final String COL_FOOD_ID       = "food_id";
     public static final String COL_MEAL_TYPE     = "meal_type";
@@ -71,7 +66,6 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_PROTEIN       = "protein";
     public static final String COL_SERVING_SIZE  = "serving_size";
     public static final String COL_SERVING_UNIT  = "serving_unit";
-    // ── New macro columns in food_log ────────────────────────────────────────
     public static final String COL_CARBS         = "carbs";
     public static final String COL_FAT           = "fat";
     public static final String COL_FIBER         = "fiber";
@@ -79,7 +73,6 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_SAT_FAT       = "sat_fat";
     public static final String COL_POLY_FAT      = "poly_fat";
 
-    // Master Food Library Table
     public static final String TABLE_FOOD_LIBRARY = "food_library";
     public static final String COL_LIB_ID         = "lib_id";
     public static final String COL_LIB_NAME       = "food_name";
@@ -92,10 +85,8 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_LIB_FIBER      = "fiber";
     public static final String COL_LIB_SUGAR      = "sugar";
     public static final String COL_LIB_SAT_FAT    = "sat_fat";
-    // ── New: polyunsaturated fat in library ──────────────────────────────────
     public static final String COL_LIB_POLY       = "poly_fat";
 
-    // Exercise Table
     public static final String TABLE_WORKOUT_LOG  = "workout_log";
     public static final String COL_WORKOUT_ID     = "workout_id";
     public static final String COL_WORKOUT_NAME   = "workout_name";
@@ -105,7 +96,6 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_WORKOUT_CALS   = "calories_burned";
     public static final String COL_WORKOUT_DATE   = "workout_date";
 
-    // Habit Log Table
     public static final String TABLE_HABIT_LOG = "habit_log";
     public static final String COL_HABIT_DATE  = "habit_date";
     public static final String COL_HABIT_DONE  = "habit_done";
@@ -115,14 +105,9 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
         this.context = context;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    // onCreate
-    // ────────────────────────────────────────────────────────────────────────
     @Override
     public void onCreate(SQLiteDatabase db) {
-
-        // Users table (now with macro goal columns)
-        String CREATE_USER_TABLE = "CREATE TABLE " + TABLE_NAME + " ("
+        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + COLUMN_ID             + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + COLUMN_USERNAME       + " TEXT, "
                 + COLUMN_PASSWORD       + " TEXT, "
@@ -133,76 +118,66 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_HEIGHT         + " REAL, "
                 + COLUMN_GOAL           + " TEXT, "
                 + COLUMN_ACTIVITY_LEVEL + " TEXT, "
-                + COLUMN_CALORIE_GOAL   + " INTEGER DEFAULT 2000, "
-                + COLUMN_PROTEIN_GOAL   + " INTEGER DEFAULT 150, "
-                + COLUMN_WATER_GOAL     + " INTEGER DEFAULT 8, "
-                + COLUMN_STEP_GOAL      + " INTEGER DEFAULT 10000, "
-                + COLUMN_CARB_GOAL      + " INTEGER DEFAULT 250, "
-                + COLUMN_FAT_GOAL       + " INTEGER DEFAULT 65, "
-                + COLUMN_FIBER_GOAL     + " INTEGER DEFAULT 30, "
-                + COLUMN_SUGAR_GOAL     + " INTEGER DEFAULT 50, "
-                + COLUMN_SAT_FAT_GOAL   + " INTEGER DEFAULT 20, "
-                + COLUMN_POLY_GOAL      + " INTEGER DEFAULT 15, "
+                + COLUMN_CALORIE_GOAL   + " INTEGER DEFAULT 0, "
+                + COLUMN_PROTEIN_GOAL   + " INTEGER DEFAULT 0, "
+                + COLUMN_WATER_GOAL     + " INTEGER DEFAULT 0, "
+                + COLUMN_STEP_GOAL      + " INTEGER DEFAULT 0, "
+                + COLUMN_CARB_GOAL      + " INTEGER DEFAULT 0, "
+                + COLUMN_FAT_GOAL       + " INTEGER DEFAULT 0, "
+                + COLUMN_FIBER_GOAL     + " INTEGER DEFAULT 0, "
+                + COLUMN_SUGAR_GOAL     + " INTEGER DEFAULT 0, "
+                + COLUMN_SAT_FAT_GOAL   + " INTEGER DEFAULT 0, "
+                + COLUMN_POLY_GOAL      + " INTEGER DEFAULT 0, "
                 + COLUMN_PROFILE_IMAGE  + " TEXT, "
-                + COLUMN_IS_DELETED     + " INTEGER DEFAULT 0)";
-        db.execSQL(CREATE_USER_TABLE);
+                + COLUMN_IS_DELETED     + " INTEGER DEFAULT 0)");
 
-        // Food library (now with poly_fat)
-        String CREATE_LIB_TABLE = "CREATE TABLE " + TABLE_FOOD_LIBRARY + " ("
-                + COL_LIB_ID   + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + COL_LIB_NAME + " TEXT, "
-                + COL_LIB_CAL  + " REAL, "
-                + COL_LIB_CARBS+ " REAL, "
-                + COL_LIB_FAT  + " REAL, "
-                + COL_LIB_PRO  + " REAL, "
-                + COL_LIB_FIBER+ " REAL, "
-                + COL_LIB_SUGAR+ " REAL, "
+        db.execSQL("CREATE TABLE " + TABLE_FOOD_LIBRARY + " ("
+                + COL_LIB_ID      + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COL_LIB_NAME    + " TEXT, "
+                + COL_LIB_CAL     + " REAL, "
+                + COL_LIB_CARBS   + " REAL, "
+                + COL_LIB_FAT     + " REAL, "
+                + COL_LIB_PRO     + " REAL, "
+                + COL_LIB_FIBER   + " REAL, "
+                + COL_LIB_SUGAR   + " REAL, "
                 + COL_LIB_SAT_FAT + " REAL, "
-                + COL_LIB_POLY + " REAL DEFAULT 0, "
-                + COL_LIB_SIZE + " REAL, "
-                + COL_LIB_UNIT + " TEXT)";
-        db.execSQL(CREATE_LIB_TABLE);
+                + COL_LIB_POLY    + " REAL DEFAULT 0, "
+                + COL_LIB_SIZE    + " REAL, "
+                + COL_LIB_UNIT    + " TEXT)");
 
-        // Weight table
-        String CREATE_WEIGHT_TABLE = "CREATE TABLE " + TABLE_WEIGHT + " ("
+        db.execSQL("CREATE TABLE " + TABLE_WEIGHT + " ("
                 + COL_WEIGHT_ID    + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + COLUMN_EMAIL     + " TEXT, "
                 + COL_WEIGHT_VALUE + " REAL, "
-                + COL_WEIGHT_DATE  + " TEXT)";
-        db.execSQL(CREATE_WEIGHT_TABLE);
+                + COL_WEIGHT_DATE  + " TEXT)");
 
-        // Daily logs table
-        String CREATE_LOGS_TABLE = "CREATE TABLE " + TABLE_DAILY_LOGS + " ("
-                + COL_LOG_ID      + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + COLUMN_EMAIL    + " TEXT, "
-                + COL_LOG_DATE    + " TEXT, "
-                + COL_CUR_WATER   + " INTEGER DEFAULT 0, "
-                + COL_CUR_STEPS   + " INTEGER DEFAULT 0, "
-                + COL_CUR_PROTEIN + " INTEGER DEFAULT 0, "
-                + COL_CUR_CALORIES+ " INTEGER DEFAULT 0)";
-        db.execSQL(CREATE_LOGS_TABLE);
+        db.execSQL("CREATE TABLE " + TABLE_DAILY_LOGS + " ("
+                + COL_LOG_ID       + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COLUMN_EMAIL     + " TEXT, "
+                + COL_LOG_DATE     + " TEXT, "
+                + COL_CUR_WATER    + " INTEGER DEFAULT 0, "
+                + COL_CUR_STEPS    + " INTEGER DEFAULT 0, "
+                + COL_CUR_PROTEIN  + " INTEGER DEFAULT 0, "
+                + COL_CUR_CALORIES + " INTEGER DEFAULT 0)");
 
-        // Food log table — now with full macro columns
-        String CREATE_FOOD_TABLE = "CREATE TABLE " + TABLE_FOOD_LOG + " ("
-                + COL_FOOD_ID     + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + COLUMN_EMAIL    + " TEXT, "
-                + COL_MEAL_TYPE   + " TEXT, "
-                + COL_FOOD_NAME   + " TEXT, "
-                + COL_SERVING_SIZE+ " REAL, "
-                + COL_SERVING_UNIT+ " TEXT, "
-                + COL_CALORIES    + " REAL DEFAULT 0, "
-                + COL_PROTEIN     + " REAL DEFAULT 0, "
-                + COL_CARBS       + " REAL DEFAULT 0, "
-                + COL_FAT         + " REAL DEFAULT 0, "
-                + COL_FIBER       + " REAL DEFAULT 0, "
-                + COL_SUGAR       + " REAL DEFAULT 0, "
-                + COL_SAT_FAT     + " REAL DEFAULT 0, "
-                + COL_POLY_FAT    + " REAL DEFAULT 0, "
-                + COL_LOG_DATE    + " TEXT)";
-        db.execSQL(CREATE_FOOD_TABLE);
+        db.execSQL("CREATE TABLE " + TABLE_FOOD_LOG + " ("
+                + COL_FOOD_ID      + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COLUMN_EMAIL     + " TEXT, "
+                + COL_MEAL_TYPE    + " TEXT, "
+                + COL_FOOD_NAME    + " TEXT, "
+                + COL_SERVING_SIZE + " REAL, "
+                + COL_SERVING_UNIT + " TEXT, "
+                + COL_CALORIES     + " REAL DEFAULT 0, "
+                + COL_PROTEIN      + " REAL DEFAULT 0, "
+                + COL_CARBS        + " REAL DEFAULT 0, "
+                + COL_FAT          + " REAL DEFAULT 0, "
+                + COL_FIBER        + " REAL DEFAULT 0, "
+                + COL_SUGAR        + " REAL DEFAULT 0, "
+                + COL_SAT_FAT      + " REAL DEFAULT 0, "
+                + COL_POLY_FAT     + " REAL DEFAULT 0, "
+                + COL_LOG_DATE     + " TEXT)");
 
-        // Workout log table
-        String CREATE_WORKOUT_TABLE = "CREATE TABLE " + TABLE_WORKOUT_LOG + " ("
+        db.execSQL("CREATE TABLE " + TABLE_WORKOUT_LOG + " ("
                 + COL_WORKOUT_ID     + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + COLUMN_EMAIL       + " TEXT, "
                 + COL_WORKOUT_DATE   + " TEXT, "
@@ -210,26 +185,19 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                 + COL_WORKOUT_SETS   + " INTEGER, "
                 + COL_WORKOUT_REPS   + " INTEGER, "
                 + COL_WORKOUT_WEIGHT + " REAL, "
-                + COL_WORKOUT_CALS   + " INTEGER)";
-        db.execSQL(CREATE_WORKOUT_TABLE);
+                + COL_WORKOUT_CALS   + " INTEGER)");
 
-        // Habit log table
-        String CREATE_HABIT_TABLE = "CREATE TABLE " + TABLE_HABIT_LOG + " ("
+        db.execSQL("CREATE TABLE " + TABLE_HABIT_LOG + " ("
                 + COL_LOG_ID     + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + COLUMN_EMAIL   + " TEXT, "
                 + COL_HABIT_DATE + " TEXT, "
-                + COL_HABIT_DONE + " INTEGER DEFAULT 0)";
-        db.execSQL(CREATE_HABIT_TABLE);
+                + COL_HABIT_DONE + " INTEGER DEFAULT 0)");
 
         prefillFoodLibrary(db);
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    // onUpgrade — migrate smoothly instead of wiping everything
-    // ────────────────────────────────────────────────────────────────────────
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_WEIGHT);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_DAILY_LOGS);
@@ -237,16 +205,12 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOOD_LIBRARY);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_WORKOUT_LOG);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_HABIT_LOG);
-
         onCreate(db);
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    // Prefill food library
-    // ────────────────────────────────────────────────────────────────────────
+    // ── Food library prefill (unchanged) ────────────────────────────────────
+
     private void prefillFoodLibrary(SQLiteDatabase db) {
-        // name, cal, carbs, fat, protein, fiber, sugar, satFat, polyFat, size, unit
-        // PROTEINS - MEAT
         insertLibraryItem(db,"Lean Minced Beef",125,0.0,4.8,22.0,0.0,0.0,1.8,0.5,100,"g");
         insertLibraryItem(db,"Beef Sirloin Steak",134,0.0,5.0,23.0,0.0,0.0,2.1,0.3,100,"g");
         insertLibraryItem(db,"Chicken Light Meat",106,0.0,1.7,24.0,0.0,0.0,0.5,0.4,100,"g");
@@ -256,31 +220,26 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
         insertLibraryItem(db,"Pork Loin Steak",225,0.0,14.0,19.9,0.0,0.0,5.0,1.6,100,"g");
         insertLibraryItem(db,"Bacon",215,1.4,18.0,16.5,0.0,1.0,6.2,2.1,100,"g");
         insertLibraryItem(db,"Venison",103,0.0,1.5,22.2,0.0,0.0,0.7,0.3,100,"g");
-        // FISH & SEAFOOD
         insertLibraryItem(db,"Cod",75,0.0,0.7,17.5,0.0,0.0,0.1,0.2,100,"g");
         insertLibraryItem(db,"Haddock",75,0.0,0.8,17.8,0.0,0.0,0.2,0.3,100,"g");
         insertLibraryItem(db,"Wild Salmon",179,0.0,10.0,22.1,0.0,0.0,2.3,3.5,100,"g");
         insertLibraryItem(db,"Prawns",77,0.2,0.9,17.6,0.0,0.0,0.2,0.3,100,"g");
         insertLibraryItem(db,"Squid",77,3.1,1.2,15.4,0.0,0.0,0.4,0.5,100,"g");
         insertLibraryItem(db,"Lobster",77,1.2,0.6,17.0,0.0,0.0,0.1,0.2,100,"g");
-        // OTHER PROTEINS
         insertLibraryItem(db,"Egg (Large)",131,1.1,9.5,13.0,0.0,1.1,3.1,1.4,100,"g");
         insertLibraryItem(db,"Whey Protein Isolate",379,4.0,1.0,90.0,0.0,1.0,0.5,0.2,100,"g");
         insertLibraryItem(db,"Pea Protein",366,8.0,6.0,66.0,4.0,0.5,1.0,2.5,100,"g");
         insertLibraryItem(db,"Beef Broth",111,3.0,7.0,7.8,0.0,1.0,2.0,0.3,100,"ml");
-        // STARCHY CARBS
         insertLibraryItem(db,"Quinoa",319,64.0,6.0,14.0,7.0,4.0,0.7,3.3,100,"g");
         insertLibraryItem(db,"Rice - Brown",354,76.0,2.8,9.3,3.5,0.7,0.6,1.0,100,"g");
         insertLibraryItem(db,"Rice - White",345,78.0,0.4,8.5,0.4,0.1,0.1,0.1,100,"g");
         insertLibraryItem(db,"Chickpeas",338,61.0,6.0,21.0,17.0,11.0,0.6,2.7,100,"g");
         insertLibraryItem(db,"Lentils (Red)",323,56.0,1.0,24.0,11.0,2.0,0.2,0.5,100,"g");
         insertLibraryItem(db,"Buckwheat",362,75.0,3.4,8.1,10.0,0.9,0.7,1.0,100,"g");
-        // STARCHY VEGETABLES
         insertLibraryItem(db,"Potatoes",84,20.0,0.1,1.9,2.2,1.2,0.0,0.0,100,"g");
         insertLibraryItem(db,"Sweet Potatoes",91,21.0,0.2,1.2,3.3,6.5,0.0,0.1,100,"g");
         insertLibraryItem(db,"Carrots",43,10.0,0.2,0.9,2.8,4.7,0.0,0.1,100,"g");
         insertLibraryItem(db,"Beetroot",45,10.0,0.2,1.7,2.8,7.0,0.0,0.1,100,"g");
-        // FRUITS
         insertLibraryItem(db,"Apple",52,14.0,0.2,0.3,2.4,10.0,0.0,0.1,100,"g");
         insertLibraryItem(db,"Banana",89,23.0,0.3,1.1,2.6,12.0,0.1,0.1,100,"g");
         insertLibraryItem(db,"Blueberry",57,14.0,0.3,0.7,2.4,10.0,0.0,0.1,100,"g");
@@ -288,24 +247,20 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
         insertLibraryItem(db,"Orange",47,12.0,0.1,0.9,2.4,9.0,0.0,0.0,100,"g");
         insertLibraryItem(db,"Strawberry",32,8.0,0.3,0.7,2.0,4.9,0.0,0.2,100,"g");
         insertLibraryItem(db,"Avocado",160,9.0,15.0,2.0,7.0,0.7,2.1,1.8,100,"g");
-        // NON-STARCHY VEGETABLES
         insertLibraryItem(db,"Broccoli",34,7.0,0.4,2.8,2.6,1.7,0.0,0.2,100,"g");
         insertLibraryItem(db,"Spinach",23,3.6,0.4,2.9,2.2,0.4,0.1,0.2,100,"g");
         insertLibraryItem(db,"Cucumber",15,3.6,0.1,0.7,0.5,1.7,0.0,0.0,100,"g");
         insertLibraryItem(db,"Mushroom",22,3.3,0.3,3.1,1.0,2.0,0.0,0.1,100,"g");
         insertLibraryItem(db,"Tomato",18,3.9,0.2,0.9,1.2,2.6,0.0,0.1,100,"g");
         insertLibraryItem(db,"Asparagus",20,3.9,0.1,2.2,2.1,1.9,0.0,0.0,100,"g");
-        // FATS
         insertLibraryItem(db,"Butter",717,0.1,81.0,0.9,0.0,0.1,51.0,3.0,100,"g");
         insertLibraryItem(db,"Olive Oil",884,0.0,100.0,0.0,0.0,0.0,14.0,10.5,100,"ml");
         insertLibraryItem(db,"Coconut Oil",892,0.0,100.0,0.0,0.0,0.0,82.0,0.2,100,"g");
         insertLibraryItem(db,"Walnuts",654,14.0,65.0,15.0,7.0,2.6,6.1,47.2,100,"g");
         insertLibraryItem(db,"Cashews",553,30.0,44.0,18.0,3.3,5.9,7.8,7.8,100,"g");
         insertLibraryItem(db,"Chia Seed",486,42.0,31.0,17.0,34.0,0.0,3.3,23.7,100,"g");
-        // PROBIOTICS
         insertLibraryItem(db,"Kefir",55,4.0,2.0,3.5,0.0,4.0,1.3,0.1,100,"g");
         insertLibraryItem(db,"Kimchee",15,2.4,0.5,1.1,1.6,1.1,0.1,0.3,100,"g");
-        // EXTRAS
         insertLibraryItem(db,"Oatmeal",389,66.0,7.0,17.0,11.0,1.0,1.2,2.5,100,"g");
         insertLibraryItem(db,"Greek Yogurt",59,3.6,0.4,10.0,0.0,3.2,0.1,0.0,100,"g");
         insertLibraryItem(db,"Milk",42,5.0,1.0,3.4,0.0,5.0,0.6,0.0,100,"ml");
@@ -322,24 +277,18 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                                    double carbs, double fat, double protein,
                                    double fiber, double sugar, double satFat,
                                    double polyFat, double size, String unit) {
-        ContentValues values = new ContentValues();
-        values.put(COL_LIB_NAME,    name);
-        values.put(COL_LIB_CAL,     calories);
-        values.put(COL_LIB_CARBS,   carbs);
-        values.put(COL_LIB_FAT,     fat);
-        values.put(COL_LIB_PRO,     protein);
-        values.put(COL_LIB_FIBER,   fiber);
-        values.put(COL_LIB_SUGAR,   sugar);
-        values.put(COL_LIB_SAT_FAT, satFat);
-        values.put(COL_LIB_POLY,    polyFat);
-        values.put(COL_LIB_SIZE,    size);
-        values.put(COL_LIB_UNIT,    unit);
-        db.insert(TABLE_FOOD_LIBRARY, null, values);
+        ContentValues v = new ContentValues();
+        v.put(COL_LIB_NAME, name);    v.put(COL_LIB_CAL, calories);
+        v.put(COL_LIB_CARBS, carbs);  v.put(COL_LIB_FAT, fat);
+        v.put(COL_LIB_PRO, protein);  v.put(COL_LIB_FIBER, fiber);
+        v.put(COL_LIB_SUGAR, sugar);  v.put(COL_LIB_SAT_FAT, satFat);
+        v.put(COL_LIB_POLY, polyFat); v.put(COL_LIB_SIZE, size);
+        v.put(COL_LIB_UNIT, unit);
+        db.insert(TABLE_FOOD_LIBRARY, null, v);
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    // Food Log — add entry (now with full macros)
-    // ────────────────────────────────────────────────────────────────────────
+    // ── All methods below: NO db.close() calls ───────────────────────────────
+
     public boolean addFoodLogEntry(String email, String mealType, String foodName,
                                    double servingSize, String servingUnit,
                                    double calories, double protein,
@@ -349,79 +298,51 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                                    String date) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(COLUMN_EMAIL,     email);
-        cv.put(COL_MEAL_TYPE,    mealType);
-        cv.put(COL_FOOD_NAME,    foodName);
-        cv.put(COL_SERVING_SIZE, servingSize);
-        cv.put(COL_SERVING_UNIT, servingUnit);
-        cv.put(COL_CALORIES,     calories);
-        cv.put(COL_PROTEIN,      protein);
-        cv.put(COL_CARBS,        carbs);
-        cv.put(COL_FAT,          fat);
-        cv.put(COL_FIBER,        fiber);
-        cv.put(COL_SUGAR,        sugar);
-        cv.put(COL_SAT_FAT,      satFat);
-        cv.put(COL_POLY_FAT,     polyFat);
-        cv.put(COL_LOG_DATE,     date);
+        cv.put(COLUMN_EMAIL, email);       cv.put(COL_MEAL_TYPE, mealType);
+        cv.put(COL_FOOD_NAME, foodName);   cv.put(COL_SERVING_SIZE, servingSize);
+        cv.put(COL_SERVING_UNIT, servingUnit); cv.put(COL_CALORIES, calories);
+        cv.put(COL_PROTEIN, protein);      cv.put(COL_CARBS, carbs);
+        cv.put(COL_FAT, fat);              cv.put(COL_FIBER, fiber);
+        cv.put(COL_SUGAR, sugar);          cv.put(COL_SAT_FAT, satFat);
+        cv.put(COL_POLY_FAT, polyFat);     cv.put(COL_LOG_DATE, date);
         long result = db.insert(TABLE_FOOD_LOG, null, cv);
-        db.close();
         return result != -1;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    // Food Log — get entries by meal (returns FoodEntry list)
-    // ────────────────────────────────────────────────────────────────────────
     public ArrayList<FoodEntry> getFoodByMeal(String email, String date, String mealType) {
         ArrayList<FoodEntry> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-
-        String query = "SELECT " + COL_FOOD_ID + ", " + COL_FOOD_NAME + ", "
-                + COL_SERVING_SIZE + ", " + COL_SERVING_UNIT + ", "
-                + COL_CALORIES + ", " + COL_PROTEIN
-                + " FROM " + TABLE_FOOD_LOG
-                + " WHERE " + COLUMN_EMAIL + " = ? AND " + COL_LOG_DATE + " = ? AND "
-                + COL_MEAL_TYPE + " = ?";
-
-        Cursor cursor = db.rawQuery(query, new String[]{email, date, mealType});
+        Cursor cursor = db.rawQuery(
+                "SELECT " + COL_FOOD_ID + ", " + COL_FOOD_NAME + ", "
+                        + COL_SERVING_SIZE + ", " + COL_SERVING_UNIT + ", "
+                        + COL_CALORIES + ", " + COL_PROTEIN
+                        + " FROM " + TABLE_FOOD_LOG
+                        + " WHERE " + COLUMN_EMAIL + " = ? AND " + COL_LOG_DATE + " = ? AND "
+                        + COL_MEAL_TYPE + " = ?",
+                new String[]{email, date, mealType});
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 FoodEntry food = new FoodEntry(
-                        cursor.getString(1),
-                        cursor.getDouble(2),
-                        cursor.getString(3),
-                        (int) cursor.getDouble(4),
-                        (int) cursor.getDouble(5)
-                );
+                        cursor.getString(1), cursor.getDouble(2), cursor.getString(3),
+                        (int) cursor.getDouble(4), (int) cursor.getDouble(5));
                 food.setId(cursor.getInt(0));
                 list.add(food);
             }
             cursor.close();
         }
-        db.close();
         return list;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    // MacroTotals — aggregate all macros for a given date (Fragment 1 & 2)
-    // ────────────────────────────────────────────────────────────────────────
     public MacroTotals getMacroTotalsForDate(String email, String date) {
         if (email == null || date == null) return new MacroTotals();
         SQLiteDatabase db = this.getReadableDatabase();
-
-        String query = "SELECT "
-                + "SUM(" + COL_CARBS   + "), "
-                + "SUM(" + COL_FAT     + "), "
-                + "SUM(" + COL_PROTEIN + "), "
-                + "SUM(" + COL_FIBER   + "), "
-                + "SUM(" + COL_SUGAR   + "), "
-                + "SUM(" + COL_SAT_FAT + "), "
-                + "SUM(" + COL_POLY_FAT+ ") "
-                + "FROM " + TABLE_FOOD_LOG
-                + " WHERE " + COLUMN_EMAIL + " = ? AND " + COL_LOG_DATE + " = ?";
-
-        Cursor cursor = db.rawQuery(query, new String[]{email, date});
+        Cursor cursor = db.rawQuery(
+                "SELECT SUM(" + COL_CARBS + "), SUM(" + COL_FAT + "), SUM(" + COL_PROTEIN + "), "
+                        + "SUM(" + COL_FIBER + "), SUM(" + COL_SUGAR + "), SUM(" + COL_SAT_FAT + "), "
+                        + "SUM(" + COL_POLY_FAT + ") FROM " + TABLE_FOOD_LOG
+                        + " WHERE " + COLUMN_EMAIL + " = ? AND " + COL_LOG_DATE + " = ?",
+                new String[]{email, date});
         MacroTotals totals = new MacroTotals();
-
         if (cursor != null && cursor.moveToFirst()) {
             totals.carbs   = cursor.isNull(0) ? 0 : cursor.getDouble(0);
             totals.fat     = cursor.isNull(1) ? 0 : cursor.getDouble(1);
@@ -432,94 +353,63 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
             totals.polyFat = cursor.isNull(6) ? 0 : cursor.getDouble(6);
             cursor.close();
         }
-        db.close();
         return totals;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    // Calorie totals per meal type (Fragment 3 pie chart)
-    // returns index: 0=Breakfast, 1=Lunch, 2=Dinner, 3=Snacks
-    // ────────────────────────────────────────────────────────────────────────
     public double[] getCaloriesPerMeal(String email, String date) {
         double[] result = new double[4];
-        // Guard: if either argument is null, return zeros immediately
         if (email == null || date == null) return result;
-
         String[] meals = {"Breakfast", "Lunch", "Dinner", "Snacks"};
         SQLiteDatabase db = this.getReadableDatabase();
-
         for (int i = 0; i < meals.length; i++) {
             Cursor cursor = db.rawQuery(
                     "SELECT SUM(" + COL_CALORIES + ") FROM " + TABLE_FOOD_LOG
                             + " WHERE " + COLUMN_EMAIL + " = ? AND " + COL_LOG_DATE + " = ? AND "
                             + COL_MEAL_TYPE + " = ?",
-                    new String[]{email, date, meals[i]}
-            );
+                    new String[]{email, date, meals[i]});
             if (cursor != null && cursor.moveToFirst()) {
                 result[i] = cursor.isNull(0) ? 0 : cursor.getDouble(0);
                 cursor.close();
             }
         }
-        db.close();
         return result;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    // Top foods by carbs for a given date (Fragment 1 bottom list)
-    // ────────────────────────────────────────────────────────────────────────
     public ArrayList<String[]> getTopFoodsByCarbs(String email, String date, int limit) {
         ArrayList<String[]> list = new ArrayList<>();
         if (email == null || date == null) return list;
         SQLiteDatabase db = this.getReadableDatabase();
-
         Cursor cursor = db.rawQuery(
-                "SELECT " + COL_FOOD_NAME + ", " + COL_CARBS
-                        + " FROM " + TABLE_FOOD_LOG
+                "SELECT " + COL_FOOD_NAME + ", " + COL_CARBS + " FROM " + TABLE_FOOD_LOG
                         + " WHERE " + COLUMN_EMAIL + " = ? AND " + COL_LOG_DATE + " = ?"
                         + " ORDER BY " + COL_CARBS + " DESC LIMIT ?",
-                new String[]{email, date, String.valueOf(limit)}
-        );
-
+                new String[]{email, date, String.valueOf(limit)});
         if (cursor != null) {
-            while (cursor.moveToNext()) {
+            while (cursor.moveToNext())
                 list.add(new String[]{cursor.getString(0),
                         String.format("%.0f g", cursor.getDouble(1))});
-            }
             cursor.close();
         }
-        db.close();
         return list;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    // Macro goals from user profile
-    // ────────────────────────────────────────────────────────────────────────
     public MacroTotals getMacroGoals(String email) {
         MacroTotals goals = new MacroTotals();
         SQLiteDatabase db = this.getReadableDatabase();
-
         Cursor cursor = db.rawQuery(
                 "SELECT " + COLUMN_CARB_GOAL + ", " + COLUMN_FAT_GOAL + ", "
                         + COLUMN_PROTEIN_GOAL + ", " + COLUMN_FIBER_GOAL + ", "
                         + COLUMN_SUGAR_GOAL + ", " + COLUMN_SAT_FAT_GOAL + ", "
                         + COLUMN_POLY_GOAL + ", " + COLUMN_CALORIE_GOAL
-                        + " FROM " + TABLE_NAME
-                        + " WHERE " + COLUMN_EMAIL + " = ?",
-                new String[]{email}
-        );
-
+                        + " FROM " + TABLE_NAME + " WHERE " + COLUMN_EMAIL + " = ?",
+                new String[]{email});
         if (cursor != null && cursor.moveToFirst()) {
-            goals.carbs    = cursor.getDouble(0);
-            goals.fat      = cursor.getDouble(1);
-            goals.protein  = cursor.getDouble(2);
-            goals.fiber    = cursor.getDouble(3);
-            goals.sugar    = cursor.getDouble(4);
-            goals.satFat   = cursor.getDouble(5);
-            goals.polyFat  = cursor.getDouble(6);
-            goals.calories = cursor.getDouble(7);
+            goals.carbs    = cursor.getDouble(0); goals.fat      = cursor.getDouble(1);
+            goals.protein  = cursor.getDouble(2); goals.fiber    = cursor.getDouble(3);
+            goals.sugar    = cursor.getDouble(4); goals.satFat   = cursor.getDouble(5);
+            goals.polyFat  = cursor.getDouble(6); goals.calories = cursor.getDouble(7);
             cursor.close();
         }
-        db.close();
         return goals;
     }
 
@@ -527,77 +417,53 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                                     int sugar, int satFat, int poly) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(COLUMN_CARB_GOAL,    carbs);
-        cv.put(COLUMN_FAT_GOAL,     fat);
-        cv.put(COLUMN_FIBER_GOAL,   fiber);
-        cv.put(COLUMN_SUGAR_GOAL,   sugar);
-        cv.put(COLUMN_SAT_FAT_GOAL, satFat);
-        cv.put(COLUMN_POLY_GOAL,    poly);
-        int result = db.update(TABLE_NAME, cv, COLUMN_EMAIL + " = ?", new String[]{email});
-        db.close();
-        return result > 0;
+        cv.put(COLUMN_CARB_GOAL, carbs);    cv.put(COLUMN_FAT_GOAL, fat);
+        cv.put(COLUMN_FIBER_GOAL, fiber);   cv.put(COLUMN_SUGAR_GOAL, sugar);
+        cv.put(COLUMN_SAT_FAT_GOAL, satFat); cv.put(COLUMN_POLY_GOAL, poly);
+        return db.update(TABLE_NAME, cv, COLUMN_EMAIL + " = ?", new String[]{email}) > 0;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    // Delete food entry (subtracts all macro columns from daily_logs)
-    // ────────────────────────────────────────────────────────────────────────
     public boolean deleteFoodEntry(int foodId, String email, String date) {
         SQLiteDatabase db = this.getWritableDatabase();
-
         double caloriesToSubtract = 0, proteinToSubtract = 0;
         Cursor cursor = db.rawQuery(
                 "SELECT " + COL_CALORIES + ", " + COL_PROTEIN
                         + " FROM " + TABLE_FOOD_LOG + " WHERE " + COL_FOOD_ID + " = ?",
                 new String[]{String.valueOf(foodId)});
-
         if (cursor.moveToFirst()) {
             caloriesToSubtract = cursor.getDouble(0);
             proteinToSubtract  = cursor.getDouble(1);
         }
         cursor.close();
-
         int deleted = db.delete(TABLE_FOOD_LOG, COL_FOOD_ID + " = ?",
                 new String[]{String.valueOf(foodId)});
-
         if (deleted > 0) {
             db.execSQL("UPDATE " + TABLE_DAILY_LOGS
                             + " SET " + COL_CUR_CALORIES + " = MAX(0, " + COL_CUR_CALORIES + " - ?), "
                             + COL_CUR_PROTEIN + " = MAX(0, " + COL_CUR_PROTEIN + " - ?)"
                             + " WHERE " + COLUMN_EMAIL + " = ? AND " + COL_LOG_DATE + " = ?",
                     new Object[]{caloriesToSubtract, proteinToSubtract, email, date});
-            db.close();
             return true;
         }
-        db.close();
         return false;
     }
 
-    // ────────────────────────────────────────────────────────────────────────
-    // All other existing methods — unchanged
-    // ────────────────────────────────────────────────────────────────────────
     public boolean updateUserWeight(String email, double newWeight) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_WEIGHT, newWeight);
-        int result = db.update(TABLE_NAME, cv, COLUMN_EMAIL + " = ?", new String[]{email});
-        db.close();
-        return result > 0;
+        return db.update(TABLE_NAME, cv, COLUMN_EMAIL + " = ?", new String[]{email}) > 0;
     }
 
     public boolean addWorkoutEntry(String email, String date, String name,
                                    int sets, int reps, double weight, int calories) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(COLUMN_EMAIL,       email);
-        cv.put(COL_WORKOUT_DATE,   date);
-        cv.put(COL_WORKOUT_NAME,   name);
-        cv.put(COL_WORKOUT_SETS,   sets);
-        cv.put(COL_WORKOUT_REPS,   reps);
-        cv.put(COL_WORKOUT_WEIGHT, weight);
-        cv.put(COL_WORKOUT_CALS,   calories);
-        long result = db.insert(TABLE_WORKOUT_LOG, null, cv);
-        db.close();
-        return result != -1;
+        cv.put(COLUMN_EMAIL, email);         cv.put(COL_WORKOUT_DATE, date);
+        cv.put(COL_WORKOUT_NAME, name);      cv.put(COL_WORKOUT_SETS, sets);
+        cv.put(COL_WORKOUT_REPS, reps);      cv.put(COL_WORKOUT_WEIGHT, weight);
+        cv.put(COL_WORKOUT_CALS, calories);
+        return db.insert(TABLE_WORKOUT_LOG, null, cv) != -1;
     }
 
     public boolean hasWeightEntryForDate(String email, String date) {
@@ -621,25 +487,21 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                         + " WHERE " + COLUMN_EMAIL + " = ? AND " + COL_WORKOUT_DATE + " = ?",
                 new String[]{email, date});
         if (cursor != null) {
-            while (cursor.moveToNext()) {
+            while (cursor.moveToNext())
                 results.add(cursor.getString(0) + " — " + cursor.getInt(1) + "x" + cursor.getInt(2)
                         + (cursor.getInt(3) > 0 ? " (~" + cursor.getInt(3) + " kcal)" : ""));
-            }
             cursor.close();
         }
-        db.close();
         return results;
     }
 
     public boolean addWeightEntry(String email, double weightValue, String date) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(COLUMN_EMAIL,     email);
+        cv.put(COLUMN_EMAIL, email);
         cv.put(COL_WEIGHT_VALUE, weightValue);
-        cv.put(COL_WEIGHT_DATE,  date);
-        long result = db.insert(TABLE_WEIGHT, null, cv);
-        db.close();
-        return result != -1;
+        cv.put(COL_WEIGHT_DATE, date);
+        return db.insert(TABLE_WEIGHT, null, cv) != -1;
     }
 
     public ArrayList<FoodEntry> searchFoodLibrary(String queryText) {
@@ -649,24 +511,12 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                 "SELECT * FROM " + TABLE_FOOD_LIBRARY + " WHERE " + COL_LIB_NAME + " LIKE ?",
                 new String[]{"%" + queryText + "%"});
         if (cursor != null) {
-            while (cursor.moveToNext()) {
-                // 0=lib_id,  1=food_name,       2=calories,  3=carbs,
-                // 4=fat,     5=protein,          6=fiber,     7=sugar,
-                // 8=sat_fat, 9=poly_fat,         10=base_serving_size, 11=base_unit
+            while (cursor.moveToNext())
                 results.add(new FoodEntry(
-                        cursor.getString(1),        // food_name
-                        cursor.getDouble(10),       // base_serving_size
-                        cursor.getString(11),       // base_unit
-                        cursor.getInt(2),           // calories
-                        (int) cursor.getDouble(5),  // protein
-                        cursor.getDouble(3),        // carbs
-                        cursor.getDouble(4),        // fat
-                        cursor.getDouble(6),        // fiber
-                        cursor.getDouble(7),        // sugar
-                        cursor.getDouble(8),        // sat_fat
-                        cursor.getDouble(9)         // poly_fat
-                ));
-            }
+                        cursor.getString(1), cursor.getDouble(10), cursor.getString(11),
+                        cursor.getInt(2), (int) cursor.getDouble(5),
+                        cursor.getDouble(3), cursor.getDouble(4), cursor.getDouble(6),
+                        cursor.getDouble(7), cursor.getDouble(8), cursor.getDouble(9)));
             cursor.close();
         }
         return results;
@@ -677,19 +527,12 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                            String goal, String activityLevel) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(COLUMN_USERNAME,       user);
-        cv.put(COLUMN_PASSWORD,       pass);
-        cv.put(COLUMN_EMAIL,          email);
-        cv.put(COLUMN_BIRTHDAY,       birthday);
-        cv.put(COLUMN_GENDER,         gender);
-        cv.put(COLUMN_WEIGHT,         weight);
-        cv.put(COLUMN_HEIGHT,         height);
-        cv.put(COLUMN_GOAL,           goal);
-        cv.put(COLUMN_ACTIVITY_LEVEL, activityLevel);
-        cv.put(COLUMN_IS_DELETED,     0);
-        long result = db.insert(TABLE_NAME, null, cv);
-        db.close();
-        return result != -1;
+        cv.put(COLUMN_USERNAME, user);         cv.put(COLUMN_PASSWORD, pass);
+        cv.put(COLUMN_EMAIL, email);           cv.put(COLUMN_BIRTHDAY, birthday);
+        cv.put(COLUMN_GENDER, gender);         cv.put(COLUMN_WEIGHT, weight);
+        cv.put(COLUMN_HEIGHT, height);         cv.put(COLUMN_GOAL, goal);
+        cv.put(COLUMN_ACTIVITY_LEVEL, activityLevel); cv.put(COLUMN_IS_DELETED, 0);
+        return db.insert(TABLE_NAME, null, cv) != -1;
     }
 
     boolean searchUser(String email, String password) {
@@ -706,34 +549,30 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_PROFILE_IMAGE, imageUri);
-        int result = db.update(TABLE_NAME, cv, COLUMN_EMAIL + " = ?", new String[]{email});
-        db.close();
-        return result > 0;
+        return db.update(TABLE_NAME, cv, COLUMN_EMAIL + " = ?", new String[]{email}) > 0;
     }
 
     public boolean softDeleteUser(String email) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_IS_DELETED, 1);
-        int result = db.update(TABLE_NAME, cv, COLUMN_EMAIL + " = ?", new String[]{email});
-        db.close();
-        return result > 0;
+        return db.update(TABLE_NAME, cv, COLUMN_EMAIL + " = ?", new String[]{email}) > 0;
     }
 
     public ArrayList<PersonalInfo> getUserList(String email) {
         ArrayList<PersonalInfo> userList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT "
-                + COLUMN_USERNAME + ", " + COLUMN_EMAIL + ", " + COLUMN_HEIGHT + ", "
-                + COLUMN_WEIGHT + ", " + COLUMN_BIRTHDAY + ", " + COLUMN_GENDER + ", "
-                + COLUMN_GOAL + ", " + COLUMN_ACTIVITY_LEVEL + ", "
-                + COLUMN_CALORIE_GOAL + ", " + COLUMN_PROTEIN_GOAL + ", "
-                + COLUMN_WATER_GOAL + ", " + COLUMN_STEP_GOAL + ", "
-                + COLUMN_PROFILE_IMAGE
-                + " FROM " + TABLE_NAME + " WHERE " + COLUMN_EMAIL + " = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{email});
+        Cursor cursor = db.rawQuery(
+                "SELECT " + COLUMN_USERNAME + ", " + COLUMN_EMAIL + ", " + COLUMN_HEIGHT + ", "
+                        + COLUMN_WEIGHT + ", " + COLUMN_BIRTHDAY + ", " + COLUMN_GENDER + ", "
+                        + COLUMN_GOAL + ", " + COLUMN_ACTIVITY_LEVEL + ", "
+                        + COLUMN_CALORIE_GOAL + ", " + COLUMN_PROTEIN_GOAL + ", "
+                        + COLUMN_WATER_GOAL + ", " + COLUMN_STEP_GOAL + ", "
+                        + COLUMN_PROFILE_IMAGE
+                        + " FROM " + TABLE_NAME + " WHERE " + COLUMN_EMAIL + " = ?",
+                new String[]{email});
         if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()) {
+            do {
                 userList.add(new PersonalInfo(
                         cursor.getString(0), cursor.getString(1),
                         cursor.getString(2), cursor.getString(3),
@@ -741,10 +580,8 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                         cursor.getString(6), cursor.getString(7),
                         cursor.getInt(8),    cursor.getInt(9),
                         cursor.getInt(10),   cursor.getInt(11),
-                        cursor.getString(12)
-                ));
-                cursor.moveToNext();
-            }
+                        cursor.getString(12)));
+            } while (cursor.moveToNext());
         }
         cursor.close();
         return userList;
@@ -753,39 +590,28 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
     public boolean updateFullProfile(String email, String name, String height, String dob) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(COLUMN_USERNAME, name);
-        cv.put(COLUMN_HEIGHT,   height);
-        cv.put(COLUMN_BIRTHDAY, dob);
-        int result = db.update(TABLE_NAME, cv, COLUMN_EMAIL + " = ?", new String[]{email});
-        db.close();
-        return result > 0;
+        cv.put(COLUMN_USERNAME, name); cv.put(COLUMN_HEIGHT, height); cv.put(COLUMN_BIRTHDAY, dob);
+        return db.update(TABLE_NAME, cv, COLUMN_EMAIL + " = ?", new String[]{email}) > 0;
     }
 
     public boolean updateGoals(String email, int calories, int steps, int water, int protein) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(COLUMN_CALORIE_GOAL, calories);
-        cv.put(COLUMN_STEP_GOAL,    steps);
-        cv.put(COLUMN_WATER_GOAL,   water);
-        cv.put(COLUMN_PROTEIN_GOAL, protein);
-        int result = db.update(TABLE_NAME, cv, COLUMN_EMAIL + " = ?", new String[]{email});
-        db.close();
-        return result > 0;
+        cv.put(COLUMN_CALORIE_GOAL, calories); cv.put(COLUMN_STEP_GOAL, steps);
+        cv.put(COLUMN_WATER_GOAL, water);      cv.put(COLUMN_PROTEIN_GOAL, protein);
+        return db.update(TABLE_NAME, cv, COLUMN_EMAIL + " = ?", new String[]{email}) > 0;
     }
 
     public void checkAndInitDailyLog(String email, String date) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_DAILY_LOGS
+        Cursor cursor = db.rawQuery("SELECT " + COL_LOG_ID + " FROM " + TABLE_DAILY_LOGS
                         + " WHERE " + COLUMN_EMAIL + " = ? AND " + COL_LOG_DATE + " = ?",
                 new String[]{email, date});
         if (cursor.getCount() == 0) {
             ContentValues cv = new ContentValues();
-            cv.put(COLUMN_EMAIL,     email);
-            cv.put(COL_LOG_DATE,     date);
-            cv.put(COL_CUR_WATER,    0);
-            cv.put(COL_CUR_STEPS,    0);
-            cv.put(COL_CUR_PROTEIN,  0);
-            cv.put(COL_CUR_CALORIES, 0);
+            cv.put(COLUMN_EMAIL, email); cv.put(COL_LOG_DATE, date);
+            cv.put(COL_CUR_WATER, 0);    cv.put(COL_CUR_STEPS, 0);
+            cv.put(COL_CUR_PROTEIN, 0);  cv.put(COL_CUR_CALORIES, 0);
             db.insert(TABLE_DAILY_LOGS, null, cv);
         }
         cursor.close();
@@ -803,7 +629,8 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<WeightEntry> getWeightHistoryList(String email) {
         ArrayList<WeightEntry> history = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT " + COL_WEIGHT_VALUE + ", " + COL_WEIGHT_DATE
+        Cursor cursor = db.rawQuery(
+                "SELECT " + COL_WEIGHT_VALUE + ", " + COL_WEIGHT_DATE
                         + " FROM " + TABLE_WEIGHT
                         + " WHERE " + COLUMN_EMAIL + " = ? ORDER BY " + COL_WEIGHT_DATE + " ASC",
                 new String[]{email});
@@ -812,7 +639,6 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                 history.add(new WeightEntry(cursor.getDouble(0), cursor.getString(1)));
             cursor.close();
         }
-        db.close();
         return history;
     }
 
@@ -826,15 +652,12 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                         + " WHERE " + COLUMN_EMAIL + " = ? AND " + COL_LOG_DATE + " = ?",
                 new String[]{email, date});
         if (cursor.moveToFirst()) {
-            stats.add(cursor.getInt(0));
-            stats.add(cursor.getInt(1));
-            stats.add(cursor.getInt(2));
-            stats.add(cursor.getInt(3));
+            stats.add(cursor.getInt(0)); stats.add(cursor.getInt(1));
+            stats.add(cursor.getInt(2)); stats.add(cursor.getInt(3));
         } else {
             stats.add(0); stats.add(0); stats.add(0); stats.add(0);
         }
         cursor.close();
-        db.close();
         return stats;
     }
 
@@ -852,7 +675,6 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         cursor.close();
-        db.close();
         return history;
     }
 
@@ -869,7 +691,7 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_EMAIL + " = ? AND " + COL_HABIT_DATE + " = ?",
                     new String[]{email, date});
         } else {
-            cv.put(COLUMN_EMAIL,   email);
+            cv.put(COLUMN_EMAIL, email);
             cv.put(COL_HABIT_DATE, date);
             db.insert(TABLE_HABIT_LOG, null, cv);
         }
@@ -901,14 +723,14 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
         ArrayList<PersonalInfo> users = getUserList(email);
         PersonalInfo p = (!users.isEmpty()) ? users.get(0) : null;
         switch (habitName) {
-            case "Eat more protein":   return p != null && protein >= p.getProteinGoal();
-            case "Drink more water":   return p != null && water   >= p.getWaterGoal();
-            case "Log a daily meal":   return calories > 0;
-            case "Hit my step goal":   return p != null && steps   >= p.getStepGoal();
+            case "Eat more protein": return p != null && protein >= p.getProteinGoal();
+            case "Drink more water": return p != null && water   >= p.getWaterGoal();
+            case "Log a daily meal": return calories > 0;
+            case "Hit my step goal": return p != null && steps   >= p.getStepGoal();
             case "Get more exercise":
-                ArrayList<String> w = getWorkoutsForDate(email, date);
-                return w != null && !w.isEmpty();
-            default:                   return false;
+                return getWorkoutsForDate(email, date) != null
+                        && !getWorkoutsForDate(email, date).isEmpty();
+            default: return false;
         }
     }
 }
