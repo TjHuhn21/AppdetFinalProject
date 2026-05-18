@@ -3,7 +3,6 @@ package com.example.heronhealth;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.widget.TableLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -16,9 +15,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.heronhealth.Fragments.CaloriesFragment;
-import com.example.heronhealth.Fragments.MacrosFragment;
-import com.example.heronhealth.Fragments.NutrientsFragment;
 import com.google.android.material.tabs.TabLayout;
 
 public class NutritionActivity extends AppCompatActivity {

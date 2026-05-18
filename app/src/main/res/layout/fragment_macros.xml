@@ -147,6 +147,7 @@
                         android:textSize="14sp"/>
 
                     <TextView
+                        android:id="@+id/tvCarbsTotal"
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:text="0%"
@@ -155,6 +156,7 @@
                         android:textSize="14sp"/>
 
                     <TextView
+                        android:id="@+id/tvCarbsGoal"
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:text="50%"
@@ -186,6 +188,7 @@
                         android:textSize="14sp"/>
 
                     <TextView
+                        android:id="@+id/tvFatTotal"
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:text="0%"
@@ -194,6 +197,7 @@
                         android:textSize="14sp"/>
 
                     <TextView
+                        android:id="@+id/tvFatGoal"
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:text="30%"
@@ -224,6 +228,7 @@
                         android:textSize="14sp"/>
 
                     <TextView
+                        android:id="@+id/tvProteinTotal"
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:text="0%"
@@ -232,6 +237,7 @@
                         android:textSize="14sp"/>
 
                     <TextView
+                        android:id="@+id/tvProteinGoal"
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:text="20%"
@@ -257,6 +263,7 @@
         style="@style/SCREEN">
 
         <LinearLayout
+            android:id="@+id/llFoodList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"

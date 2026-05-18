@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg4"
     android:orientation="vertical"
     android:padding="8dp">
 
+    <!-- ── Date navigation card ─────────────────────────────────────────── -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/dateNavLayout"
         android:layout_width="match_parent"
@@ -61,6 +61,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- ── Scrollable body ───────────────────────────────────────────────── -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -72,6 +73,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- ── Nutrition info card (pie + summary rows) ────────────── -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardNutritionInfo"
                 android:layout_width="match_parent"
@@ -87,6 +89,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
+                    <!-- Background image -->
                     <ImageView
                         android:id="@+id/cardBgImage"
                         android:layout_width="match_parent"
@@ -98,6 +101,7 @@
                         android:scaleType="centerCrop"
                         android:src="@drawable/foodie" />
 
+                    <!-- Dark overlay -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -105,6 +109,7 @@
                         android:layout_alignTop="@+id/llCardContent"
                         android:background="#A6000000" />
 
+                    <!-- Content -->
                     <LinearLayout
                         android:id="@+id/llCardContent"
                         android:layout_width="match_parent"
@@ -112,33 +117,41 @@
                         android:orientation="vertical"
                         android:padding="16dp">
 
+                        <!-- Pie chart -->
                         <com.github.mikephil.charting.charts.PieChart
                             android:id="@+id/pieChart"
                             android:layout_width="match_parent"
                             android:layout_height="220dp"
                             android:layout_marginBottom="16dp" />
 
+                        <!-- ── Meal legend (2-column grid) ─────────────── -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
 
+                            <!-- Left column: Breakfast + Dinner -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:orientation="vertical"
-                                android:gravity="center_vertical">
+                                android:gravity="center_vertical"
+                                android:orientation="vertical">
+
+                                <!-- Breakfast -->
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:gravity="center_vertical">
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
                                     <View
                                         android:layout_width="14dp"
                                         android:layout_height="14dp"
                                         android:background="#3B82F6" />
+
                                     <TextView
+                                        android:id="@+id/tvBreakfastPct"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="10dp"
@@ -146,17 +159,22 @@
                                         android:textColor="#FFFFFF"
                                         android:textSize="13sp" />
                                 </LinearLayout>
+
+                                <!-- Dinner -->
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="16dp"
-                                    android:orientation="horizontal"
-                                    android:gravity="center_vertical">
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
                                     <View
                                         android:layout_width="14dp"
                                         android:layout_height="14dp"
                                         android:background="#2563EB" />
+
                                     <TextView
+                                        android:id="@+id/tvDinnerPct"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="10dp"
@@ -166,23 +184,29 @@
                                 </LinearLayout>
                             </LinearLayout>
 
+                            <!-- Right column: Lunch + Snacks -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:orientation="vertical"
+                                android:layout_marginStart="8dp"
                                 android:gravity="center_vertical"
-                                android:layout_marginStart="8dp">
+                                android:orientation="vertical">
+
+                                <!-- Lunch -->
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:gravity="center_vertical">
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
                                     <View
                                         android:layout_width="14dp"
                                         android:layout_height="14dp"
                                         android:background="#60A5FA" />
+
                                     <TextView
+                                        android:id="@+id/tvLunchPct"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="10dp"
@@ -190,17 +214,22 @@
                                         android:textColor="#FFFFFF"
                                         android:textSize="13sp" />
                                 </LinearLayout>
+
+                                <!-- Snacks -->
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="16dp"
-                                    android:orientation="horizontal"
-                                    android:gravity="center_vertical">
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
                                     <View
                                         android:layout_width="14dp"
                                         android:layout_height="14dp"
                                         android:background="#1D4ED8" />
+
                                     <TextView
+                                        android:id="@+id/tvSnacksPct"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="10dp"
@@ -211,22 +240,29 @@
                             </LinearLayout>
                         </LinearLayout>
 
+                        <!-- ── Summary rows ────────────────────────────── -->
+
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
                             android:layout_marginTop="16dp"
                             android:background="#2D3139" />
+
+                        <!-- Total Calories -->
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:paddingVertical="12dp">
+
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Total Calories"
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
+
                             <TextView
+                                android:id="@+id/tvTotalCalories"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentEnd="true"
@@ -234,21 +270,27 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
                         </RelativeLayout>
+
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
                             android:background="#2D3139" />
+
+                        <!-- Net Calories -->
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:paddingVertical="12dp">
+
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Net Calories"
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
+
                             <TextView
+                                android:id="@+id/tvNetCalories"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentEnd="true"
@@ -256,32 +298,40 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
                         </RelativeLayout>
+
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
                             android:background="#2D3139" />
+
+                        <!-- Goal -->
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:paddingVertical="12dp">
+
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Goal"
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp" />
+
                             <TextView
+                                android:id="@+id/tvGoalCalories"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentEnd="true"
-                                android:text="2,410"
+                                android:text="0"
                                 android:textColor="#2D9CDB"
                                 android:textSize="14sp" />
                         </RelativeLayout>
+
                     </LinearLayout>
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- ── Top-carb foods card ─────────────────────────────────── -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardFoodList"
                 style="@style/SCREEN"
@@ -313,47 +363,14 @@
                         android:layout_marginTop="12dp"
                         android:background="#2D3139" />
 
-                    <RelativeLayout
+                    <!-- Dynamic food rows are added here by CaloriesFragment -->
+                    <LinearLayout
+                        android:id="@+id/llFoodList"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp">
+                        android:orientation="vertical"
+                        android:layout_marginTop="8dp" />
 
-                        <TextView
-                            style="@style/TEXT"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Rice Bowl (example)"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            style="@style/TEXT"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:text="43 g"
-                            android:textSize="14sp" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp">
-
-                        <TextView
-                            style="@style/TEXT"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Tomato Soup (example)"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            style="@style/TEXT"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:text="30 g"
-                            android:textSize="14sp" />
-                    </RelativeLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

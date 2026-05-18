@@ -416,7 +416,6 @@ public class DashboardFragment extends Fragment {
         btnLogWorkout         = view.findViewById(R.id.btnLogWorkout);
 
         weightLineChart = view.findViewById(R.id.weightLineChart);
-        // FIXED: Capitalized "S" to align precisely with your updated XML resource index matching layout rules
         stepLineChart   = view.findViewById(R.id.StepsLineChart);
         btnAddWeight    = view.findViewById(R.id.btnAddWeight);
 
@@ -668,6 +667,7 @@ public class DashboardFragment extends Fragment {
                     user.getWaterGoal(), user.getStepGoal());
         }
     }
+
 
     private void displayGoals(int calories, int protein, int water, int steps) {
         waterGoalMl = water; stepGoal = steps;

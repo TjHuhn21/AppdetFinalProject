@@ -225,6 +225,12 @@ public class FoodSearchActivity extends AppCompatActivity {
         double ratio    = serving / food.getServingSize();
         int scaledCals  = (int) (food.getCalories()  * ratio);
         int scaledProt  = (int) (food.getProtein()   * ratio);
+        double scaledCarbs   = food.getCarbs() * ratio;
+        double scaledFat     = food.getFat() * ratio;
+        double scaledFiber   = food.getFiber() * ratio;
+        double scaledSugar   = food.getSugar() * ratio;
+        double scaledSatFat  = food.getSatFat() * ratio;
+        double scaledPolyFat = food.getPolyFat() * ratio;
 
         // Insert food log record
         boolean foodSaved = myDb.addFoodLogEntry(
@@ -235,6 +241,12 @@ public class FoodSearchActivity extends AppCompatActivity {
                 food.getUnit(),
                 scaledCals,
                 scaledProt,
+                scaledCarbs,
+                scaledFat,
+                scaledFiber,
+                scaledSugar,
+                scaledSatFat,
+                scaledPolyFat,
                 todayDate
         );
 
