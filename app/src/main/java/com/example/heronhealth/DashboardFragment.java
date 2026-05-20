@@ -75,7 +75,7 @@ public class DashboardFragment extends Fragment {
 
     // Weight + Steps charts
     private LineChart weightLineChart, stepLineChart;
-    private MaterialButton btnAddWeight;
+    private MaterialButton btnAddWeight ,btnAddWater;
 
     // Weekly habits
     private TextView tvHabitSubtitle;
@@ -179,14 +179,15 @@ public class DashboardFragment extends Fragment {
 
         // Click listeners
        /* caloriesCardView.setOnClickListener(v ->
-                startActivity(new Intent(getContext(), NutritionActivity.class)));
+                startActivity(new Intent(getContext(), NutritionActivity.class)));*/
 
         btnUpdateWater.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), WaterAddActivity.class);
             intent.putExtra("CURRENT_WATER", currentWaterValue);
             intent.putExtra("TARGET_WATER", waterGoalMl);
             startActivity(intent);
-        });*/
+        });
+
 
         btnLogWorkout.setOnClickListener(v ->
                 startActivity(new Intent(getContext(), AddExerciseActivity.class)));
@@ -388,6 +389,8 @@ public class DashboardFragment extends Fragment {
 
         tvHabitSubtitle = view.findViewById(R.id.tvHabitSubtitle);
         btnStartHabit   = view.findViewById(R.id.btnStartHabit);
+
+        btnAddWater = view.findViewById(R.id.btnAddWeight);
 
         int[] frameIds = {R.id.frameMonDay, R.id.frameTueDay, R.id.frameWedDay,
                 R.id.frameThuDay, R.id.frameFriDay, R.id.frameSatDay, R.id.frameSunDay};
