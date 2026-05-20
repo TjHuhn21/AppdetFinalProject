@@ -3,7 +3,6 @@ package com.example.heronhealth;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,10 +14,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 public class LoginActivity extends AppCompatActivity {
     EditText etEmail, etPassword;
     Button btnLogin, btnSignup;
     AlertDialog.Builder builder;
+
+    private static final long SESSION_DURATION_MS = 7L * 24 * 60 * 60 * 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,62 +34,67 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
+        SharedPreferences prefs = getSharedPreferences("HeronHealthPrefs", MODE_PRIVATE);
+        if (prefs.getBoolean("isLoggedIn", false)) {
+            long loginTime = prefs.getLong("login_time", 0);
+            long elapsed = System.currentTimeMillis() - loginTime;
+            if (elapsed < SESSION_DURATION_MS) {
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+                return;
+            } else {
+                prefs.edit().clear().apply();
+            }
+        }
+
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
-
         btnLogin = findViewById(R.id.btnLogin);
         btnSignup = findViewById(R.id.btnSignUp);
         builder = new AlertDialog.Builder(this);
         createListeners();
     }
-    public void createListeners(){
-        btnSignup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-                startActivity(intent);
+
+    public void createListeners() {
+        btnSignup.setOnClickListener(view -> startActivity(new Intent(LoginActivity.this, SignUpActivity.class)));
+
+        btnLogin.setOnClickListener(view -> {
+            String email = etEmail.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
+
+            if (email.isEmpty() || password.isEmpty()) {
+                displayMessage("Input Error!", "Please fill all fields");
+                return;
             }
-        });
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                displayMessage("Invalid Email", "Please enter a valid email address.");
+                return;
+            }
+            MyDatabaseHelper myDb = new MyDatabaseHelper(LoginActivity.this);
 
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //validation
-                if(etEmail.getText().toString().isEmpty() || etPassword.getText().toString().isEmpty()){
-                    displayMessage("Input Error!", "Please fill all fields");
-                    return;
-                }
-                if (!android.util.Patterns.EMAIL_ADDRESS.matcher(etEmail.getText().toString().trim()).matches()) {
-                    displayMessage("Invalid Email", "Please enter a valid email address.");
-                    return;
-                }
-                //check if user exists
-                MyDatabaseHelper myDatabaseHelper = new MyDatabaseHelper(LoginActivity.this);
-                boolean userMatch = myDatabaseHelper.searchUser(etEmail.getText().toString().trim(), etPassword.getText().toString().trim());
+            String storedHash = myDb.getHashedPassword(email);
 
-                //if usermatch it logs in and if not present error message
-                if (!userMatch){
-                    displayMessage("LogIn Error!", "Incorrect username or password");
-                }else {
-                    SharedPreferences sharedPref = getSharedPreferences("HeronHealthPrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPref.edit();
+            if (storedHash != null && BCrypt.checkpw(password, storedHash)) {
+                SharedPreferences sharedPref = getSharedPreferences("HeronHealthPrefs", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean("isLoggedIn", true);
+                editor.putString("userEmail", email);
+                editor.putLong("login_time", System.currentTimeMillis());
+                editor.apply();
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                finish();
+            } else {
+                displayMessage("Login Error!", "Incorrect email or password.");
 
-                    editor.putBoolean("isLoggedIn", true);
-                    editor.putString("userEmail", etEmail.getText().toString().trim());
-                    editor.apply();
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
             }
         });
     }
-    public void displayMessage(String title, String message){
+
+    public void displayMessage(String title, String message) {
         builder.setCancelable(true);
         builder.setTitle(title);
         builder.setMessage(message);
         builder.setPositiveButton("OK", null);
         builder.show();
     }
-
 }

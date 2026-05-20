@@ -18,6 +18,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.util.Calendar;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -127,8 +129,10 @@ public class SignUpActivity extends AppCompatActivity {
                 return;
             }
 
+            String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+
             // ── Step 1: Register user ─────────────────────────────────────────────
-            boolean success = myDb.addUser(username, password, email, birthday,
+            boolean success = myDb.addUser(username, hashedPassword, email, birthday,
                     gender, weightKg, heightCm, goal, activityLevel);
 
             if (!success) {
@@ -166,17 +170,17 @@ public class SignUpActivity extends AppCompatActivity {
             // Carbs: 55% of calories ÷ 4 kcal/g (midpoint of NASM's 45–65% range)
             int carbGoal = (int)((calorieGoal * 0.55) / 4.0);
 
-            // Fiber: 30g general recommendation
-            int fiberGoal = 30;
+            // Fiber goal
+            int fiberGoal = (int)((calorieGoal / 1000.0) * 14);
 
-            // Sugar: 50g general recommendation
-            int sugarGoal = 50;
+            // Sugar goal
+            int sugarGoal = (int)((calorieGoal * 0.10) / 4);
 
-            // Saturated fat: 20g general recommendation
-            int satFatGoal = 20;
+            // Saturated fat goal
+            int satFatGoal = (int)((calorieGoal * 0.10) / 9);
 
-            // Polyunsaturated fat: 15g general recommendation
-            int polyGoal = 15;
+            // Polyunsaturated goal
+            int polyGoal = (int)((calorieGoal * 0.07) / 9);
 
             // ── Step 6: Water (Kinetico: 1 oz per 2 lbs → ml) ───────────────────
             double weightLbs = weightKg * 2.20462;
@@ -184,12 +188,9 @@ public class SignUpActivity extends AppCompatActivity {
 
             // ── Step 7: Steps default ─────────────────────────────────────────────
             int stepGoal = 7000;
-
-            // ── Step 8: Save all goals to DB ──────────────────────────────────────
             myDb.updateGoals(email, calorieGoal, stepGoal, waterGoalMl, proteinGoal);
             myDb.updateMacroGoals(email, carbGoal, fatGoal, fiberGoal, sugarGoal, satFatGoal, polyGoal);
 
-            // ── Success ───────────────────────────────────────────────────────────
             successMessage.setCancelable(false);
             successMessage.setTitle("Success");
             successMessage.setMessage("Welcome to HeronHealth!");

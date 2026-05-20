@@ -50,5 +50,8 @@ dependencies {
     implementation("com.github.denzcoskun:ImageSlideshow:0.1.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation ("com.github.dhaval2404:imagepicker:2.1")
+    implementation ("org.mindrot:jbcrypt:0.4")
+    implementation ("net.zetetic:android-database-sqlcipher:4.5.4")
+    implementation ("androidx.sqlite:sqlite:2.3.1")
 
 }

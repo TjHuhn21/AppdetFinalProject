@@ -1,3 +1,4 @@
+
 package com.example.heronhealth;
 
 import android.content.ContentValues;
@@ -14,12 +15,14 @@ import com.example.heronhealth.model.PersonalInfo;
 import com.example.heronhealth.model.StepEntry;
 import com.example.heronhealth.model.WeightEntry;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.util.ArrayList;
 
 class MyDatabaseHelper extends SQLiteOpenHelper {
     private Context context;
     private static final String DATABASE_NAME = "HeronHealth.db";
-    private static final int DATABASE_VERSION = 12;
+    private static final int DATABASE_VERSION = 13;
 
     private static final String TABLE_NAME = "heron_User";
     private static final String COLUMN_ID = "user_ID";
@@ -208,8 +211,6 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // ── Food library prefill ────────────────────────────────────
-
     private void prefillFoodLibrary(SQLiteDatabase db) {
         insertLibraryItem(db,"Lean Minced Beef",125,0.0,4.8,22.0,0.0,0.0,1.8,0.5,100,"g");
         insertLibraryItem(db,"Beef Sirloin Steak",134,0.0,5.0,23.0,0.0,0.0,2.1,0.3,100,"g");
@@ -286,8 +287,6 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
         v.put(COL_LIB_UNIT, unit);
         db.insert(TABLE_FOOD_LIBRARY, null, v);
     }
-
-    // ── All methods below: NO db.close() calls ───────────────────────────────
 
     public boolean addFoodLogEntry(String email, String mealType, String foodName,
                                    double servingSize, String servingUnit,
@@ -535,14 +534,23 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
         return db.insert(TABLE_NAME, null, cv) != -1;
     }
 
-    boolean searchUser(String email, String password) {
+    boolean searchUser(String email, String plainPassword) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_NAME, new String[]{COLUMN_ID},
-                COLUMN_EMAIL + " = ? AND " + COLUMN_PASSWORD + " = ? AND " + COLUMN_IS_DELETED + " = 0",
-                new String[]{email, password}, null, null, null, "1");
-        int count = cursor.getCount();
+        Cursor cursor = db.query(TABLE_NAME,
+                new String[]{COLUMN_PASSWORD},
+                COLUMN_EMAIL + " = ? AND " + COLUMN_IS_DELETED + " = 0",
+                new String[]{email}, null, null, null, "1");
+        if (cursor == null || !cursor.moveToFirst()) {
+            if (cursor != null) cursor.close();
+            return false;
+        }
+        String storedHash = cursor.getString(0);
         cursor.close();
-        return count > 0;
+        try {
+            return BCrypt.checkpw(plainPassword, storedHash);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean updateUserImage(String email, String imageUri) {
@@ -733,29 +741,35 @@ class MyDatabaseHelper extends SQLiteOpenHelper {
             default: return false;
         }
     }
+
     public int getExerciseCalories(String email, String date) {
-
         SQLiteDatabase db = this.getReadableDatabase();
-
         int total = 0;
-
         Cursor cursor = db.rawQuery(
-                "SELECT SUM(" + COL_WORKOUT_CALS + ") " +
-                        "FROM " + TABLE_WORKOUT_LOG +
-                        " WHERE " + COLUMN_EMAIL + "=? " +
-                        "AND " + COL_WORKOUT_DATE + "=?",
-                new String[]{email, date}
-        );
-
+                "SELECT SUM(" + COL_WORKOUT_CALS + ") FROM " + TABLE_WORKOUT_LOG
+                        + " WHERE " + COLUMN_EMAIL + " = ? AND " + COL_WORKOUT_DATE + " = ?",
+                new String[]{email, date});
         if (cursor.moveToFirst()) {
-
-            total = cursor.isNull(0)
-                    ? 0
-                    : cursor.getInt(0);
+            total = cursor.isNull(0) ? 0 : cursor.getInt(0);
         }
-
         cursor.close();
-
         return total;
+    }
+    public String getHashedPassword(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String hashedPassword = null;
+
+        String query = "SELECT " + COLUMN_PASSWORD + " FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_EMAIL + " = ? AND " + COLUMN_IS_DELETED + " = 0";
+
+        Cursor cursor = db.rawQuery(query, new String[]{email});
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                hashedPassword = cursor.getString(0);
+            }
+            cursor.close();
+        }
+        return hashedPassword;
     }
 }

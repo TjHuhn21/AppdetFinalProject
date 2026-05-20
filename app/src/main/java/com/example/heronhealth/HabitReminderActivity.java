@@ -247,12 +247,6 @@ public class HabitReminderActivity extends AppCompatActivity {
             );
         }
     }
-
-    /**
-     * Fallback for when exact alarm permission isn't granted.
-     * Uses setWindow() for a reasonable ±15-min window — still
-     * much better than setInexactRepeating.
-     */
     private void setInexactAlarm(AlarmManager alarmManager,
                                  Calendar trigger,
                                  PendingIntent pendingIntent) {

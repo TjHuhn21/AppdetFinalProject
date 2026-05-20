@@ -4,9 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#11182B">
+    android:background="#F5F7FA">
 
-    <!-- CLOSE BUTTON -->
     <TextView
         android:id="@+id/btnCloseReminder"
         android:layout_width="48dp"
@@ -15,7 +14,7 @@
         android:layout_marginTop="16dp"
         android:gravity="center"
         android:text="✕"
-        android:textColor="#AAAAAA"
+        android:textColor="#888888"
         android:textSize="20sp"
         android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,13 +25,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="Weekly Habits"
-        android:textColor="#AAAAAA"
+        android:textColor="#888888"
         android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@id/btnCloseReminder"
         app:layout_constraintTop_toTopOf="@id/btnCloseReminder"
         app:layout_constraintBottom_toBottomOf="@id/btnCloseReminder"/>
 
-    <!-- HEADING -->
     <TextView
         android:id="@+id/tvNudgeTitle"
         android:layout_width="0dp"
@@ -40,7 +38,7 @@
         android:layout_marginHorizontal="24dp"
         android:layout_marginTop="36dp"
         android:text="Want a nudge?"
-        android:textColor="#FFFFFF"
+        android:textColor="#1A1A2E"
         android:textSize="26sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -54,22 +52,23 @@
         android:layout_marginHorizontal="24dp"
         android:layout_marginTop="8dp"
         android:text="New habits can be hard. We can help with a daily reminder."
-        android:textColor="#AAAAAA"
+        android:textColor="#888888"
         android:textSize="15sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvNudgeTitle"/>
 
-    <!-- NOTIFICATION CARD -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardNotif"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="24dp"
         android:layout_marginTop="28dp"
-        app:cardBackgroundColor="#1E2A3B"
+        app:cardBackgroundColor="#FFFFFF"
         app:cardCornerRadius="16dp"
-        app:cardElevation="0dp"
+        app:cardElevation="2dp"
+        app:strokeColor="#E0E0E0"
+        app:strokeWidth="1dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvNudgeSubtitle">
@@ -80,7 +79,6 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- TOGGLE ROW -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -97,7 +95,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Push notifications"
-                        android:textColor="#FFFFFF"
+                        android:textColor="#1A1A2E"
                         android:textSize="17sp"
                         android:textStyle="bold"/>
 
@@ -107,7 +105,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="Habit reminders turned on"
-                        android:textColor="#777777"
+                        android:textColor="#AAAAAA"
                         android:textSize="13sp"/>
                 </LinearLayout>
 
@@ -121,14 +119,12 @@
 
             </LinearLayout>
 
-            <!-- DIVIDER -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginVertical="16dp"
-                android:background="#2D3A4A"/>
+                android:background="#F0F0F0"/>
 
-            <!-- REMINDER TIME ROW -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -141,7 +137,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Reminder time"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#1A1A2E"
                     android:textSize="17sp"
                     android:textStyle="bold"/>
 
@@ -160,7 +156,6 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- TIP TEXT -->
     <TextView
         android:id="@+id/tvTip"
         android:layout_width="0dp"
@@ -175,7 +170,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cardNotif"/>
 
-    <!-- BOTTOM BUTTONS -->
     <ImageButton
         android:id="@+id/btnBackReminder"
         android:layout_width="52dp"

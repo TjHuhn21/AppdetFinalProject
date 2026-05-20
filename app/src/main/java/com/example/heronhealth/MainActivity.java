@@ -27,8 +27,6 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this); // ← move BEFORE setContentView
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        // Use binding directly instead of findViewById — safer with ViewBinding
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);

@@ -14,21 +14,17 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
  */
 public class NutritionPagerAdapter extends FragmentStateAdapter {
 
-    private final String email;
     private String date;
 
-    // Keep references so we can push date changes later
-    private MacrosFragment         macrosFragment;
+    private MacrosFragment    macrosFragment;
     private NutrientsFragment extendedFragment;
-    private CaloriesFragment       caloriesFragment;
+    private CaloriesFragment  caloriesFragment;
 
     public NutritionPagerAdapter(@NonNull FragmentManager fm,
                                  @NonNull Lifecycle lifecycle,
-                                 String email,
                                  String date) {
         super(fm, lifecycle);
-        this.email = email;
-        this.date  = date;
+        this.date = date;
     }
 
     @NonNull
@@ -36,16 +32,16 @@ public class NutritionPagerAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch (position) {
             case 0:
-                macrosFragment = MacrosFragment.newInstance(email, date);
+                macrosFragment = MacrosFragment.newInstance(date);
                 return macrosFragment;
             case 1:
-                extendedFragment = NutrientsFragment.newInstance(email, date);
+                extendedFragment = NutrientsFragment.newInstance(date);
                 return extendedFragment;
             case 2:
-                caloriesFragment = CaloriesFragment.newInstance(email, date);
+                caloriesFragment = CaloriesFragment.newInstance(date);
                 return caloriesFragment;
             default:
-                macrosFragment = MacrosFragment.newInstance(email, date);
+                macrosFragment = MacrosFragment.newInstance(date);
                 return macrosFragment;
         }
     }
@@ -53,10 +49,6 @@ public class NutritionPagerAdapter extends FragmentStateAdapter {
     @Override
     public int getItemCount() { return 3; }
 
-    /**
-     * Call this from the host when the user navigates to a new date.
-     * Each fragment refreshes its own data independently.
-     */
     public void updateDate(String newDate) {
         this.date = newDate;
         if (macrosFragment   != null) macrosFragment.refreshData(newDate);

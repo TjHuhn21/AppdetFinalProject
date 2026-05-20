@@ -1,5 +1,7 @@
 package com.example.heronhealth;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -35,21 +37,15 @@ public class CaloriesFragment extends Fragment {
     private String userEmail;
     private MyDatabaseHelper db;
 
-    // Chart
     private PieChart pieChart;
-
-    // Meal legend labels  (Breakfast / Lunch / Dinner / Snacks)
     private TextView tvBreakfastPct, tvLunchPct, tvDinnerPct, tvSnacksPct;
-
-    // Summary rows
     private TextView tvTotalCalories, tvNetCalories, tvGoalCalories;
 
     // ── Factory ─────────────────────────────────────────────────────────────
-    public static CaloriesFragment newInstance(String email, String date) {
+    public static CaloriesFragment newInstance(String date) {
         CaloriesFragment f = new CaloriesFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_EMAIL, email);
-        args.putString(ARG_DATE,  date);
+        args.putString(ARG_DATE, date);
         f.setArguments(args);
         return f;
     }
@@ -58,8 +54,9 @@ public class CaloriesFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences prefs = requireContext().getSharedPreferences("HeronHealthPrefs", Context.MODE_PRIVATE);
+        userEmail = prefs.getString("userEmail", null);
         if (getArguments() != null) {
-            userEmail    = getArguments().getString(ARG_EMAIL);
             selectedDate = getArguments().getString(ARG_DATE);
         }
         db = new MyDatabaseHelper(requireContext());
@@ -70,7 +67,6 @@ public class CaloriesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        // Rename your third XML to fragment_calories.xml
         return inflater.inflate(R.layout.fragment_calories, container, false);
     }
 
@@ -81,10 +77,13 @@ public class CaloriesFragment extends Fragment {
         loadData();
     }
 
-    // ── View binding ─────────────────────────────────────────────────────────
-    // Add these android:id values to the TextViews in your third XML:
-    //   tvBreakfastPct, tvLunchPct, tvDinnerPct, tvSnacksPct
-    //   tvTotalCalories, tvNetCalories, tvGoalCalories
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadData();
+    }
+
+
     private void bindViews(View view) {
         pieChart         = view.findViewById(R.id.pieChart);
         tvBreakfastPct   = view.findViewById(R.id.tvBreakfastPct);
@@ -98,8 +97,11 @@ public class CaloriesFragment extends Fragment {
 
     // ── Data loading ─────────────────────────────────────────────────────────
     private void loadData() {
-        // Guard: don't query if email or date haven't been set yet
-        if (userEmail == null || selectedDate == null) return;
+        if (userEmail == null || selectedDate == null) {
+            tvGoalCalories.setText("Nothing");
+            return;
+        }
+
         // [0]=Breakfast [1]=Lunch [2]=Dinner [3]=Snacks
         double[] mealCals = db.getCaloriesPerMeal(userEmail, selectedDate);
         MacroTotals goals = db.getMacroGoals(userEmail);
@@ -120,43 +122,21 @@ public class CaloriesFragment extends Fragment {
         if (tvTotalCalories != null)
             tvTotalCalories.setText(String.format("%.0f", total));
 
-        // Net = Total (no exercise burns stored here, but you can subtract
-        // workout calories if you add that query; for now it equals total)
-        double exerciseBurn = getExerciseCalories();
+        double exerciseBurn = db.getExerciseCalories(userEmail, selectedDate);
         double net = total - exerciseBurn;
         if (tvNetCalories != null)
             tvNetCalories.setText(String.format("%.0f", net));
 
         // Goal — blue
         if (tvGoalCalories != null) {
-            tvGoalCalories.setText(String.format("%.0f", goals.calories));
+            if (goals.calories > 0) {
+                tvGoalCalories.setText(String.format("%.0f", goals.calories));
+            } else {
+                tvGoalCalories.setText("—");
+            }
             tvGoalCalories.setTextColor(Color.parseColor("#2D9CDB"));
         }
     }
-
-    /** Sum of calories_burned from workout_log for the selected date. */
-    private double getExerciseCalories() {
-        // Uses the existing getWorkoutsForDate which returns strings, so we
-        // query directly. Return 0 if you haven't wired this up yet.
-        try {
-            android.database.sqlite.SQLiteDatabase sqlDb =
-                    db.getReadableDatabase();
-            android.database.Cursor c = sqlDb.rawQuery(
-                    "SELECT SUM(" + MyDatabaseHelper.COL_WORKOUT_CALS + ")"
-                            + " FROM " + MyDatabaseHelper.TABLE_WORKOUT_LOG
-                            + " WHERE " + "user_email" + " = ? AND "
-                            + MyDatabaseHelper.COL_WORKOUT_DATE + " = ?",
-                    new String[]{userEmail, selectedDate});
-            double result = 0;
-            if (c != null && c.moveToFirst() && !c.isNull(0))
-                result = c.getDouble(0);
-            if (c != null) c.close();
-            return result;
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
     // ── Pie chart setup ──────────────────────────────────────────────────────
     private void setupPieChart(double[] cals, double total) {
         List<PieEntry> entries = new ArrayList<>();
@@ -181,6 +161,7 @@ public class CaloriesFragment extends Fragment {
                 Color.parseColor("#2563EB"),  // Dinner    – medium blue
                 Color.parseColor("#1D4ED8")   // Snacks    – dark blue
         };
+
 
         List<Integer> usedColors = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
@@ -220,28 +201,22 @@ public class CaloriesFragment extends Fragment {
         chart.animateY(800);
     }
 
-    /**
-     * Updates a meal legend TextView with the format:
-     *   "MealName\nX% (Y cal)"
-     * The meal name prefix is already set in the XML; here we only update
-     * the dynamic percentage and calorie values on the second line.
-     */
-    private void updateLegend(TextView tv, double mealCal, double total) {
-        if (tv == null) return;
-        String pct = total > 0
-                ? String.format("%.0f%%", (mealCal / total) * 100)
-                : "0%";
-        // The TextView text in XML is e.g. "Breakfast\n0% (0 cal)"
-        // We replace the second line dynamically:
-        String current = tv.getText().toString();
-        String mealName = current.contains("\n")
-                ? current.substring(0, current.indexOf("\n"))
-                : current;
-        tv.setText(mealName + "\n" + pct + " (" + String.format("%.0f", mealCal) + " cal)");
-        tv.setTextColor(Color.WHITE);
-    }
 
-    // ── Public refresh ───────────────────────────────────────────────────────
+     //Updates a meal legend TextView with the format:
+     private void updateLegend(TextView tv, double mealCal, double total) {
+         if (tv == null) return;
+         String pct = total > 0
+         ? String.format("%.0f%%", (mealCal / total) * 100)
+         : "0%";
+
+         String current  = tv.getText().toString();
+         String mealName = current.contains("\n")
+         ? current.substring(0, current.indexOf("\n"))
+         : current;
+         tv.setText(mealName + "\n" + pct + " (" + String.format("%.0f", mealCal) + " cal)");
+         tv.setTextColor(Color.WHITE);
+     }
+
     public void refreshData(String newDate) {
         this.selectedDate = newDate;
         loadData();

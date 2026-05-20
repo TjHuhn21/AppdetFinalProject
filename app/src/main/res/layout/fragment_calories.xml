@@ -121,8 +121,7 @@
                         <com.github.mikephil.charting.charts.PieChart
                             android:id="@+id/pieChart"
                             android:layout_width="match_parent"
-                            android:layout_height="220dp"
-                            android:layout_marginBottom="16dp" />
+                            android:layout_height="220dp"/>
 
                         <!-- ── Meal legend (2-column grid) ─────────────── -->
                         <LinearLayout
@@ -331,48 +330,6 @@
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ── Top-carb foods card ─────────────────────────────────── -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardFoodList"
-                style="@style/SCREEN"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                app:strokeColor="#042437"
-                app:strokeWidth="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        style="@style/TEXT"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Foods Highest in Carbohydrates"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="12dp"
-                        android:background="#2D3139" />
-
-                    <!-- Dynamic food rows are added here by CaloriesFragment -->
-                    <LinearLayout
-                        android:id="@+id/llFoodList"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="8dp" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
     </ScrollView>

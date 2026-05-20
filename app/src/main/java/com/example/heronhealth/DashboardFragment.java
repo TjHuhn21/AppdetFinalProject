@@ -178,8 +178,8 @@ public class DashboardFragment extends Fragment {
         buildWeekDates();
 
         // Click listeners
-       /* caloriesCardView.setOnClickListener(v ->
-                startActivity(new Intent(getContext(), NutritionActivity.class)));*/
+       caloriesCardView.setOnClickListener(v ->
+                startActivity(new Intent(getContext(), NutritionActivity.class)));
 
         btnUpdateWater.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), WaterAddActivity.class);
@@ -219,10 +219,8 @@ public class DashboardFragment extends Fragment {
             requireContext().registerReceiver(stepReceiver, filter);
         }
 
-        // Re-load goals in case they changed (e.g. user updated profile)
         checkAndLoadData();
 
-        // Then refresh stats using the freshly loaded goal fields
         refreshDashboardStats();
     }
 
@@ -410,10 +408,8 @@ public class DashboardFragment extends Fragment {
 
     // ── GOALS ────────────────────────────────────────────────────────────────
 
-    /**
-     * Loads the user's goals from the DB into the goal fields AND updates the UI.
-     * Must be called before refreshDashboardStats().
-     */
+     //Loads the user's goals from the DB into the goal fields AND updates the UI.
+
     private void checkAndLoadData() {
             ArrayList<PersonalInfo> users = myDb.getUserList(currentUserEmail);
             if (!users.isEmpty()) {
@@ -426,62 +422,6 @@ public class DashboardFragment extends Fragment {
             }
     }
 
-    private void calculateInitialGoals(PersonalInfo user) {
-        double weightKg = Double.parseDouble(user.getWeight());
-        double heightCm = Double.parseDouble(user.getHeight());
-        int age          = calculateAge(user.getDateOfBirth());
-        String gender    = user.getGender();
-        String activity  = user.getActivityLevel();
-        String goal      = user.getGoal();
-
-        // ── Step 1: BMR (Mifflin-St Jeor) ───────────────────────────────────────
-        double bmr = gender.equalsIgnoreCase("Male")
-                ? (10 * weightKg) + (6.25 * heightCm) - (5 * age) + 5
-                : (10 * weightKg) + (6.25 * heightCm) - (5 * age) - 161;
-
-        // ── Step 2: TDEE ─────────────────────────────────────────────────────────
-        double tdee;
-        switch (activity) {
-            case "Lightly Active": tdee = bmr * 1.375; break;
-            case "Active":         tdee = bmr * 1.55;  break;
-            case "Very Active":    tdee = bmr * 1.725; break;
-            default:               tdee = bmr * 1.2;   break; // Sedentary
-        }
-
-        // ── Step 3: Calorie goal based on user goal ───────────────────────────────
-        calorieGoalField = goal.equalsIgnoreCase("Lose Weight") ? (int)(tdee - 500)
-                : goal.equalsIgnoreCase("Gain Muscle")          ? (int)(tdee + 300)
-                : (int) tdee;
-
-        // ── Step 4: Macros (NASM guidelines) ─────────────────────────────────────
-
-        // Protein: 1.6g/kg for active users (midpoint of 1.4–2.2 range), 1.1g/kg sedentary
-        boolean isActive = activity.equals("Active") || activity.equals("Very Active");
-        proteinGoalField = isActive
-                ? (int)(weightKg * 1.6)
-                : (int)(weightKg * 1.1);
-
-        // Fat: minimum 1g/kg (NASM recommendation)
-        int fatGoal = (int)(weightKg * 1.0);
-
-        // Carbs: 55% of total calories is the midpoint of the 45–65% NASM range
-        // 4 calories per gram of carbohydrate
-        int carbGoal = (int)((calorieGoalField * 0.55) / 4.0);
-
-        // Water: 1 oz per 2 lbs body weight, converted to ml (1 oz = 29.5735 ml)
-        // weightKg → lbs = weightKg * 2.20462
-        double weightLbs = weightKg * 2.20462;
-        waterGoalMl = (int)((weightLbs / 2.0) * 29.5735);
-
-        // Steps: sensible default
-        stepGoal = 7000;
-
-        // ── Persist to DB ─────────────────────────────────────────────────────────
-        myDb.updateGoals(currentUserEmail, calorieGoalField, stepGoal, waterGoalMl, proteinGoalField);
-        myDb.updateMacroGoals(currentUserEmail, carbGoal, fatGoal, 30, 50, 20, 15);
-
-        applyGoalsToUI();
-    }
 
     /**
      * Pushes the goal fields to all UI elements.
@@ -499,18 +439,6 @@ public class DashboardFragment extends Fragment {
 
         tvTargetWater.setText("Target: " + waterGoalMl + " ml");
         pbWaterIntake.setMax(waterGoalMl);
-    }
-
-    private int calculateAge(String dobString) {
-        try {
-            String[] parts = dobString.split("/");
-            Calendar dob = Calendar.getInstance();
-            dob.set(Integer.parseInt(parts[2]), Integer.parseInt(parts[1]) - 1, Integer.parseInt(parts[0]));
-            Calendar today = Calendar.getInstance();
-            int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
-            if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) age--;
-            return age;
-        } catch (Exception e) { return 25; }
     }
 
     // ── STATS ────────────────────────────────────────────────────────────────

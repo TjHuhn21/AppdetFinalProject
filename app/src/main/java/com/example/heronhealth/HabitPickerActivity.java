@@ -69,7 +69,7 @@ public class HabitPickerActivity extends AppCompatActivity {
                 return;
             }
 
-            // 1. Calculate the Monday of this week as the start point
+            //Calculate the Monday of this week as the start point
             java.util.Calendar monday = java.util.Calendar.getInstance();
             int dow = monday.get(java.util.Calendar.DAY_OF_WEEK);
             int daysBack = (dow == java.util.Calendar.SUNDAY) ? 6 : dow - java.util.Calendar.MONDAY;
@@ -79,16 +79,12 @@ public class HabitPickerActivity extends AppCompatActivity {
                     "yyyy-MM-dd", java.util.Locale.getDefault()
             ).format(monday.getTime());
 
-            // 2. Pack the picked habit details into an Intent
+            //Pack the picked habit details into an Intent
             Intent intent = new Intent(HabitPickerActivity.this, HabitReminderActivity.class);
             intent.putExtra("HABIT_NAME", selectedHabitName);
             intent.putExtra("HABIT_EMOJI", selectedHabitEmoji);
             intent.putExtra("WEEK_START", weekStart);
-
-            // 3. Move to the reminder screen to ask for the time
             startActivity(intent);
-
-            // 4. Close the picker so the user can't accidentally navigate back into it
             finish();
         });
     }

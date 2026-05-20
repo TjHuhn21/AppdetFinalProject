@@ -44,16 +44,15 @@ public class MacrosFragment extends Fragment {
     private TextView tvCarbsTotal, tvCarbsGoal;
     private TextView tvFatTotal,   tvFatGoal;
     private TextView tvProteinTotal, tvProteinGoal;
-    private LinearLayout llFoodList;
+    private TextView tvCarbsLabel, tvFatLabel, tvProteinLabel;
 
     private MyDatabaseHelper db;
 
     // ── Factory ─────────────────────────────────────────────────────────────
-    public static MacrosFragment newInstance(String email, String date) {
+    public static MacrosFragment newInstance(String date) {
         MacrosFragment f = new MacrosFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_EMAIL, email);
-        args.putString(ARG_DATE,  date);
+        args.putString(ARG_DATE, date);
         f.setArguments(args);
         return f;
     }
@@ -62,8 +61,9 @@ public class MacrosFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences prefs = requireContext().getSharedPreferences("HeronHealthPrefs", Context.MODE_PRIVATE);
+        userEmail = prefs.getString("userEmail", null);
         if (getArguments() != null) {
-            userEmail    = getArguments().getString(ARG_EMAIL);
             selectedDate = getArguments().getString(ARG_DATE);
         }
         db = new MyDatabaseHelper(requireContext());
@@ -74,7 +74,6 @@ public class MacrosFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        // Inflate your first XML (rename the file to fragment_macros.xml)
         return inflater.inflate(R.layout.fragment_macros, container, false);
     }
 
@@ -85,18 +84,24 @@ public class MacrosFragment extends Fragment {
         loadData();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadData();
+    }
+
     // ── View binding ─────────────────────────────────────────────────────────
     private void bindViews(View view) {
-        pieChart = view.findViewById(R.id.pieChart);
-
+        pieChart       = view.findViewById(R.id.pieChart);
         tvCarbsTotal   = view.findViewById(R.id.tvCarbsTotal);
         tvCarbsGoal    = view.findViewById(R.id.tvCarbsGoal);
         tvFatTotal     = view.findViewById(R.id.tvFatTotal);
         tvFatGoal      = view.findViewById(R.id.tvFatGoal);
         tvProteinTotal = view.findViewById(R.id.tvProteinTotal);
         tvProteinGoal  = view.findViewById(R.id.tvProteinGoal);
-
-        llFoodList = view.findViewById(R.id.llFoodList); // wrap the dynamic food rows
+        tvCarbsLabel   = view.findViewById(R.id.tvCarbsLabel);
+        tvFatLabel     = view.findViewById(R.id.tvFatLabel);
+        tvProteinLabel = view.findViewById(R.id.tvProteinLabel);
     }
 
     // ── Data loading ─────────────────────────────────────────────────────────
@@ -110,21 +115,21 @@ public class MacrosFragment extends Fragment {
 
         // ── Macro rows ───────────────────────────────────────────────────────
         double totalMacroG = totals.carbs + totals.fat + totals.protein;
+        if (tvCarbsLabel != null)
+            tvCarbsLabel.setText(String.format("Carbohydrates (%.0fg)", totals.carbs));
+        if (tvFatLabel != null)
+            tvFatLabel.setText(String.format("Fat (%.0fg)", totals.fat));
+        if (tvProteinLabel != null)
+            tvProteinLabel.setText(String.format("Protein (%.0fg)", totals.protein));
 
-        setMacroRow(tvCarbsTotal,   tvCarbsGoal,
-                totals.carbs, goals.carbs, totalMacroG, 0.50);
-        setMacroRow(tvFatTotal,     tvFatGoal,
-                totals.fat,   goals.fat,   totalMacroG, 0.30);
-        setMacroRow(tvProteinTotal, tvProteinGoal,
-                totals.protein, goals.protein, totalMacroG, 0.20);
+        setMacroRow(tvCarbsTotal,   tvCarbsGoal, totals.carbs,   goals.carbs,   totalMacroG, goals.calories, 0.50);
+        setMacroRow(tvFatTotal,     tvFatGoal, totals.fat,     goals.fat,     totalMacroG, goals.calories, 0.30);
+        setMacroRow(tvProteinTotal, tvProteinGoal, totals.protein, goals.protein, totalMacroG, goals.calories, 0.20);
 
-        // ── Top-carb foods list ──────────────────────────────────────────────
-        populateFoodList();
     }
 
-    private void setMacroRow(TextView tvTotal, TextView tvGoal,
-                             double actual, double goal,
-                             double totalMacroG, double defaultGoalPct) {
+    private void setMacroRow(TextView tvTotal, TextView tvGoal, double actual, double goalG, double totalMacroG,
+                             double calorieGoal, double defaultGoalPct) {
         // "X%" actual share of total macros logged
         String pctText = totalMacroG > 0
                 ? String.format("%.0f%%", (actual / totalMacroG) * 100)
@@ -132,13 +137,19 @@ public class MacrosFragment extends Fragment {
         if (tvTotal != null) tvTotal.setText(pctText);
 
         // Goal column: use DB goal if set, else fall back to default %
-        double goalPct = goal > 0 && (goals(goal, totalMacroG) > 0)
-                ? (goal / (goals(goal, totalMacroG)) * 100)
-                : defaultGoalPct * 100;
-        if (tvGoal != null) tvGoal.setText(String.format("%.0f%%", goalPct));
+        double goalPct;
+        if (goalG > 0 && calorieGoal > 0) {
+            goalPct = defaultGoalPct * 100;
+        } else {
+        goalPct = defaultGoalPct * 100;
+        }
+        if (tvGoal != null){
+            tvGoal.setText(String.format("%.0fg", goalG));
+        } else {
+            tvGoal.setText(String.format("%.0f%%", goalPct));
+        }
+        tvGoal.setTextColor(Color.parseColor("#2D9CDB"));
     }
-
-    private double goals(double goal, double total) { return goal; }
 
     private void setupPieChart(MacroTotals t) {
         List<PieEntry> entries = new ArrayList<>();
@@ -149,7 +160,6 @@ public class MacrosFragment extends Fragment {
         float total   = carbs + fat + protein;
 
         if (total == 0) {
-            // Empty state — show a single grey slice
             entries.add(new PieEntry(1f, "No data"));
             PieDataSet set = new PieDataSet(entries, "");
             set.setColors(Color.DKGRAY);
@@ -168,8 +178,8 @@ public class MacrosFragment extends Fragment {
 
         PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setColors(
-                Color.parseColor("#FFE831"),   // Carbs  – yellow
-                Color.parseColor("#16A61D"),   // Fat    – green
+                Color.parseColor("#FFE831"),   // Carbs   – yellow
+                Color.parseColor("#16A61D"),   // Fat     – green
                 Color.parseColor("#A13539")    // Protein – red
         );
         dataSet.setValueTextColor(Color.WHITE);
@@ -206,73 +216,6 @@ public class MacrosFragment extends Fragment {
         return (t.carbs * 4) + (t.protein * 4) + (t.fat * 9);
     }
 
-    private void populateFoodList() {
-        if (llFoodList == null) return;
-        llFoodList.removeAllViews();
-
-        ArrayList<String[]> foods = db.getTopFoodsByCarbs(userEmail, selectedDate, 5);
-
-        if (foods.isEmpty()) {
-            TextView empty = new TextView(requireContext());
-            empty.setText("No foods logged yet");
-            empty.setTextColor(Color.parseColor("#8A8D93"));
-            empty.setTextSize(13f);
-            llFoodList.addView(empty);
-            return;
-        }
-
-        for (String[] food : foods) {
-            RelativeLayout row = buildFoodRow(food[0], food[1]);
-            llFoodList.addView(row);
-
-            // Divider
-            View divider = new View(requireContext());
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, 1);
-            lp.topMargin = dpToPx(8);
-            divider.setLayoutParams(lp);
-            divider.setBackgroundColor(Color.parseColor("#2D3139"));
-            llFoodList.addView(divider);
-        }
-    }
-
-    private RelativeLayout buildFoodRow(String name, String value) {
-        RelativeLayout row = new RelativeLayout(requireContext());
-        LinearLayout.LayoutParams rowLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        rowLp.topMargin = dpToPx(10);
-        row.setLayoutParams(rowLp);
-
-        TextView tvName = new TextView(requireContext());
-        tvName.setText(name);
-        tvName.setTextColor(Color.WHITE);
-        tvName.setTextSize(14f);
-        RelativeLayout.LayoutParams nameLp = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT);
-        nameLp.addRule(RelativeLayout.ALIGN_PARENT_START);
-        tvName.setLayoutParams(nameLp);
-
-        TextView tvVal = new TextView(requireContext());
-        tvVal.setText(value);
-        tvVal.setTextColor(Color.WHITE);
-        tvVal.setTextSize(14f);
-        RelativeLayout.LayoutParams valLp = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT);
-        valLp.addRule(RelativeLayout.ALIGN_PARENT_END);
-        tvVal.setLayoutParams(valLp);
-
-        row.addView(tvName);
-        row.addView(tvVal);
-        return row;
-    }
-
-    private int dpToPx(int dp) {
-        float density = requireContext().getResources().getDisplayMetrics().density;
-        return Math.round(dp * density);
-    }
 
     // ── Public refresh (called by host when date changes) ───────────────────
     public void refreshData(String newDate) {
